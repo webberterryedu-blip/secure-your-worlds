@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Render verification files
+*render*.txt
+*dashboard*.txt
