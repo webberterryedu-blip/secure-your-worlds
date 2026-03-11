@@ -67,6 +67,18 @@ const App = () => (
                 <Route path="other" element={<OtherPage />} />
               </Route>
 
+              {/* Identities - proteção direta (acesso via /identities) */}
+              <Route
+                path="/identities"
+                element={
+                  <PrivateRoute>
+                    <MainLayout />
+                  </PrivateRoute>
+                }
+              >
+                <Route index element={<Identities />} />
+              </Route>
+
               {/* Secrets Vault - protegido por múltiplas camadas de autenticação */}
               <Route
                 path="/secrets/setup"
