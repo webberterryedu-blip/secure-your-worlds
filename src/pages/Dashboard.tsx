@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Shield, Plus, Search, LogOut, Download, Mail, Users, Code, Wallet, Star, AlertTriangle } from "lucide-react";
+import { Shield, Plus, Search, LogOut, Download, Mail, Users, Code, Wallet, Star, AlertTriangle, Key } from "lucide-react";
 import { CATEGORIES, DEVICES } from "@/lib/password";
 import { differenceInDays } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
@@ -45,20 +45,44 @@ export default function Dashboard() {
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [filterDevice, setFilterDevice] = useState("all");
+  const [filterService, setFilterService] = useState("all");
+  const [filterEnvironment, setFilterEnvironment] = useState("all");
   const [filterFavorite, setFilterFavorite] = useState(false);
 
-  const filtered = useMemo(() => {
-    return credentials.filter((c) => {
-      if (search) {
-        const q = search.toLowerCase();
-        if (!c.nick.toLowerCase().includes(q) && !c.email?.toLowerCase().includes(q) && !c.description?.toLowerCase().includes(q)) return false;
-      }
-      if (filterCategory !== "all" && c.category !== filterCategory) return false;
-      if (filterDevice !== "all" && !c.devices.includes(filterDevice)) return false;
-      if (filterFavorite && !c.is_favorite) return false;
-      return true;
+  // Get unique services for filter dropdown
+  const services = useMemo(() => {
+    const uniqueServices = new Set<string>();
+    credentials.forEach((c) => {
+      if (c.service) uniqueServices.add(c.service);
     });
-  }, [credentials, search, filterCategory, filterDevice, filterFavorite]);
+    return Array.from(uniqueServices).sort();
+  }, [credentials]);
+
+  const filtered = useMemo(() => {
+    return credentials
+      .filter((c) => {
+        if (search) {
+          const q = search.toLowerCase();
+          if (!c.nick.toLowerCase().includes(q) && !c.email?.toLowerCase().includes(q) && !c.description?.toLowerCase().includes(q) && !c.service?.toLowerCase().includes(q)) return false;
+        }
+        if (filterCategory !== "all" && c.category !== filterCategory) return false;
+        if (filterDevice !== "all" && !c.devices.includes(filterDevice)) return false;
+        if (filterService !== "all" && c.service !== filterService) return false;
+        if (filterEnvironment !== "all" && c.environment !== filterEnvironment) return false;
+        if (filterFavorite && !c.is_favorite) return false;
+        return true;
+      })
+      // Sort: favorites first, then by last_used desc, then by created_at desc
+      .sort((a, b) => {
+        if (a.is_favorite !== b.is_favorite) {
+          return a.is_favorite ? -1 : 1;
+        }
+        const aTime = a.last_used ? new Date(a.last_used).getTime() : 0;
+        const bTime = b.last_used ? new Date(b.last_used).getTime() : 0;
+        if (aTime !== bTime) return bTime - aTime;
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      });
+  }, [credentials, search, filterCategory, filterDevice, filterService, filterEnvironment, filterFavorite]);
 
   const stats = useMemo(() => {
     const total = credentials.length;
@@ -114,7 +138,10 @@ export default function Dashboard() {
               <Download className="h-4 w-4" />
             </Button>
             <span className="hidden text-sm text-muted-foreground sm:inline">{user?.email}</span>
-            <Button variant="ghost" size="icon" onClick={async () => {
+            <Button variant="ghost" size="icon" onClick={() => navigate("/secrets")} title="Secrets Vault">
+                  <Key className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={async () => {
                   await signOut();
                   navigate("/"); 
                 }} title="Sair">
@@ -156,10 +183,28 @@ export default function Dashboard() {
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar por nick, e-mail, descrição..."
+              placeholder="Buscar por nick, e-mail, serviço, descrição..."
               className="pl-9"
             />
           </div>
+          <Select value={filterService} onValueChange={setFilterService}>
+            <SelectTrigger className="w-[150px]"><SelectValue placeholder="Serviço" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos os serviços</SelectItem>
+              {services.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Select value={filterEnvironment} onValueChange={setFilterEnvironment}>
+            <SelectTrigger className="w-[130px]"><SelectValue placeholder="Ambiente" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="development">Desenvolvimento</SelectItem>
+              <SelectItem value="staging">Staging</SelectItem>
+              <SelectItem value="production">Produção</SelectItem>
+              <SelectItem value="personal">Pessoal</SelectItem>
+              <SelectItem value="work">Trabalho</SelectItem>
+            </SelectContent>
+          </Select>
           <Select value={filterCategory} onValueChange={setFilterCategory}>
             <SelectTrigger className="w-[160px]"><SelectValue placeholder="Categoria" /></SelectTrigger>
             <SelectContent>

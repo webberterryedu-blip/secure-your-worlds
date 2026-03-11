@@ -10,8 +10,12 @@ import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import SecretsUnlock from "./pages/SecretsUnlock";
+import SecretsSetup from "./pages/SecretsSetup";
+import SecretsDashboard from "./pages/SecretsDashboard";
 
 import PrivateRoute from "./components/PrivateRoute";
+import SecretsAuth from "./components/SecretsAuth";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +41,36 @@ const App = () => (
                 element={
                   <PrivateRoute>
                     <Dashboard />
+                  </PrivateRoute>
+                }
+              />
+
+              {/* Secrets Vault - protegido por múltiplas camadas de autenticação */}
+              <Route
+                path="/secrets/setup"
+                element={
+                  <PrivateRoute>
+                    <SecretsAuth>
+                      <SecretsSetup />
+                    </SecretsAuth>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/secrets/unlock"
+                element={
+                  <PrivateRoute>
+                    <SecretsUnlock onUnlock={() => {}} />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/secrets"
+                element={
+                  <PrivateRoute>
+                    <SecretsAuth>
+                      <SecretsDashboard />
+                    </SecretsAuth>
                   </PrivateRoute>
                 }
               />

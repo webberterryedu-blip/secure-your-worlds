@@ -43,8 +43,7 @@ const resources = {
       "features.expiration.description": "Receive alerts when your passwords are about to expire.",
       
       // Benefits
-      "benefits.title": "Why choose Secure Your Worlds?",
-      "benefits.subtitle": "An open-source alternative to commercial password managers, with a focus on privacy and security.",
+      "benefits.title": "Why choose VaultKey?",      "benefits.subtitle": "An open-source alternative to commercial password managers, with a focus on privacy and security.",
       "benefits.cta": "Create Free Account",
       
       // Benefit items
@@ -155,8 +154,7 @@ const resources = {
       "features.expiration.description": "Receba alertas quando suas senhas estiverem prestes a expirar.",
       
       // Benefits
-      "benefits.title": "Por que escolher o Secure Your Worlds?",
-      "benefits.subtitle": "Uma alternativa open-source aos gerenciadores de senhas comerciais, com foco em privacidade e segurança.",
+      "benefits.title": "Por que escolher o VaultKey?",      "benefits.subtitle": "Uma alternativa open-source aos gerenciadores de senhas comerciais, com foco em privacidade e segurança.",
       "benefits.cta": "Criar Conta Grátis",
       
       // Benefit items

@@ -29,6 +29,7 @@ export type Database = {
           iv: string | null
           kdf_algorithm: string | null
           kdf_iterations: number | null
+          last_used: string | null
           nick: string
           notes: string | null
           password: string
@@ -54,6 +55,7 @@ export type Database = {
           iv?: string | null
           kdf_algorithm?: string | null
           kdf_iterations?: number | null
+          last_used?: string | null
           nick: string
           notes?: string | null
           password: string
@@ -79,6 +81,7 @@ export type Database = {
           iv?: string | null
           kdf_algorithm?: string | null
           kdf_iterations?: number | null
+          last_used?: string | null
           nick?: string
           notes?: string | null
           password?: string
@@ -113,6 +116,87 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      secrets: {
+        Row: {
+          id: string
+          user_id: string
+          service_name: string
+          token_name: string
+          encrypted_value: string
+          iv: string
+          salt: string
+          secret_type: string
+          description: string | null
+          expires_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          service_name: string
+          token_name: string
+          encrypted_value: string
+          iv: string
+          salt: string
+          secret_type?: string
+          description?: string | null
+          expires_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          service_name?: string
+          token_name?: string
+          encrypted_value?: string
+          iv?: string
+          salt?: string
+          secret_type?: string
+          description?: string | null
+          expires_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_secrets_config: {
+        Row: {
+          id: string
+          user_id: string
+          secrets_password_hash: string
+          secrets_password_salt: string
+          totp_secret: string | null
+          totp_enabled: boolean
+          auto_lock_minutes: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          secrets_password_hash: string
+          secrets_password_salt: string
+          totp_secret?: string | null
+          totp_enabled?: boolean
+          auto_lock_minutes?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          secrets_password_hash?: string
+          secrets_password_salt?: string
+          totp_secret?: string | null
+          totp_enabled?: boolean
+          auto_lock_minutes?: number
+          created_at?: string
+          updated_at?: string
         }
         Relationships: []
       }

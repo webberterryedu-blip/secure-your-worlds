@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff, Copy, Star, Trash2, Pencil, Mail, Users, Code, Wallet, ExternalLink } from "lucide-react";
+import { Eye, EyeOff, Copy, Star, Trash2, Pencil, Mail, Users, Code, Wallet, ExternalLink, Server, Folder } from "lucide-react";
 import { toast } from "sonner";
 import { differenceInDays } from "date-fns";
 import type { Credential } from "@/hooks/useCredentials";
@@ -12,6 +12,14 @@ const CATEGORY_ICON: Record<string, React.ReactNode> = {
   "Redes Sociais": <Users className="h-4 w-4" />,
   "Projetos/Dev": <Code className="h-4 w-4" />,
   "Financeiro": <Wallet className="h-4 w-4" />,
+};
+
+const ENVIRONMENTS = {
+  development: { label: "Dev", color: "bg-blue-500/10 text-blue-500 border-blue-500/20" },
+  staging: { label: "Staging", color: "bg-orange-500/10 text-orange-500 border-orange-500/20" },
+  production: { label: "Prod", color: "bg-red-500/10 text-red-500 border-red-500/20" },
+  personal: { label: "Pessoal", color: "bg-green-500/10 text-green-500 border-green-500/20" },
+  work: { label: "Trabalho", color: "bg-purple-500/10 text-purple-500 border-purple-500/20" },
 };
 
 interface Props {
@@ -44,11 +52,19 @@ export default function CredentialCard({ credential, onEdit, onDelete, onToggleF
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h3 className="font-semibold truncate">{c.nick}</h3>
+                <h3 className="font-semibold truncate">{c.service || c.nick}</h3>
+                {c.environment && (
+                  <Badge className={`text-[10px] px-1.5 py-0 border ${ENVIRONMENTS[c.environment as keyof typeof ENVIRONMENTS]?.color || "bg-muted text-muted-foreground"}`}>
+                    {ENVIRONMENTS[c.environment as keyof typeof ENVIRONMENTS]?.label || c.environment}
+                  </Badge>
+                )}
                 {isExpired && <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Expirada</Badge>}
                 {isExpiringSoon && <Badge className="bg-warning text-warning-foreground text-[10px] px-1.5 py-0">Expira em {daysUntilExpiry}d</Badge>}
               </div>
-              {c.email && (
+              {(c.service ? c.nick : c.email) && (
+                <p className="text-sm text-muted-foreground truncate">{c.service ? c.nick : c.email}</p>
+              )}
+              {!c.service && c.email && (
                 <p className="text-sm text-muted-foreground truncate">{c.email}</p>
               )}
             </div>
@@ -74,10 +90,27 @@ export default function CredentialCard({ credential, onEdit, onDelete, onToggleF
         </div>
 
         {c.devices.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-1">
-            {c.devices.map((d) => (
+          <div className="mt-2 flex flex-wrap gap-1">
+            {c.devices.slice(0, 3).map((d) => (
               <Badge key={d} variant="secondary" className="text-[10px]">{d}</Badge>
             ))}
+            {c.devices.length > 3 && (
+              <Badge variant="outline" className="text-[10px]">+{c.devices.length - 3}</Badge>
+            )}
+          </div>
+        )}
+
+        {(c.projects && c.projects.length > 0) && (
+          <div className="mt-2 flex flex-wrap gap-1">
+            {c.projects.slice(0, 3).map((p) => (
+              <Badge key={p} variant="outline" className="text-[10px] border-emerald-500/30 text-emerald-400">
+                <Folder className="h-3 w-3 mr-1" />
+                {p}
+              </Badge>
+            ))}
+            {c.projects.length > 3 && (
+              <Badge variant="outline" className="text-[10px]">+{c.projects.length - 3} projetos</Badge>
+            )}
           </div>
         )}
 
