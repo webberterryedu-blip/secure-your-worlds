@@ -10,7 +10,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Eye, EyeOff, Wand2, Copy, Plus, X } from "lucide-react";
 import { generatePassword, getPasswordStrength, CATEGORIES, DEVICES } from "@/lib/password";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
 import type { Credential, CredentialInsert } from "@/hooks/useCredentials";
 
 const ENVIRONMENTS = ["development", "staging", "production", "personal", "work"] as const;
@@ -63,7 +62,7 @@ export default function CredentialForm({ open, onClose, onSubmit, initial }: Pro
   };
 
   const removeProject = (project: string) => {
-    setProjects((prev) => prev.filter((p) => p !== project));
+    setProjects(projects.filter(p => p !== project));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -217,7 +216,7 @@ export default function CredentialForm({ open, onClose, onSubmit, initial }: Pro
                 value={newProject} 
                 onChange={(e) => setNewProject(e.target.value)} 
                 placeholder="Adicionar projeto..."
-                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addProject())}
+                onKeyPress={(e) => e.key === 'Enter' && addProject()}
               />
               <Button type="button" variant="outline" size="icon" onClick={addProject}>
                 <Plus className="h-4 w-4" />

@@ -21,12 +21,21 @@ export type Database = {
           description: string | null
           devices: string[]
           email: string | null
+          encrypted_password: string | null
+          environment: string | null
           expires_at: string | null
           id: string
           is_favorite: boolean
+          iv: string | null
+          kdf_algorithm: string | null
+          kdf_iterations: number | null
           nick: string
           notes: string | null
           password: string
+          projects: string[] | null
+          salt: string | null
+          service: string | null
+          service_url: string | null
           updated_at: string
           url: string | null
           user_id: string
@@ -37,12 +46,21 @@ export type Database = {
           description?: string | null
           devices?: string[]
           email?: string | null
+          encrypted_password?: string | null
+          environment?: string | null
           expires_at?: string | null
           id?: string
           is_favorite?: boolean
+          iv?: string | null
+          kdf_algorithm?: string | null
+          kdf_iterations?: number | null
           nick: string
           notes?: string | null
           password: string
+          projects?: string[] | null
+          salt?: string | null
+          service?: string | null
+          service_url?: string | null
           updated_at?: string
           url?: string | null
           user_id: string
@@ -53,12 +71,21 @@ export type Database = {
           description?: string | null
           devices?: string[]
           email?: string | null
+          encrypted_password?: string | null
+          environment?: string | null
           expires_at?: string | null
           id?: string
           is_favorite?: boolean
+          iv?: string | null
+          kdf_algorithm?: string | null
+          kdf_iterations?: number | null
           nick?: string
           notes?: string | null
           password?: string
+          projects?: string[] | null
+          salt?: string | null
+          service?: string | null
+          service_url?: string | null
           updated_at?: string
           url?: string | null
           user_id?: string

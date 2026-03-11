@@ -61,11 +61,6 @@ CREATE TABLE public.credentials (
   iv TEXT, -- Initialization vector for AES-GCM (Base64 encoded)
   kdf_algorithm TEXT DEFAULT 'PBKDF2', -- Algorithm used for key derivation
   kdf_iterations INTEGER DEFAULT 100000, -- Number of iterations
-  -- New: Form fields
-  service TEXT, -- Service name (e.g., GitHub, AWS)
-  service_url TEXT, -- Service URL
-  environment TEXT CHECK (environment IN ('development', 'staging', 'production', 'personal', 'work')), -- Environment type
-  projects TEXT[] DEFAULT '{}', -- Associated projects
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );

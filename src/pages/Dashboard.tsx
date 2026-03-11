@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCredentials } from "@/hooks/useCredentials";
 import type { Credential, CredentialInsert, CredentialUpdate } from "@/hooks/useCredentials";
@@ -33,6 +34,7 @@ const CATEGORY_ICON: Record<string, React.ReactNode> = {
 };
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { credentials, isLoading, addCredential, updateCredential, deleteCredential, toggleFavorite } = useCredentials();
 
@@ -112,7 +114,10 @@ export default function Dashboard() {
               <Download className="h-4 w-4" />
             </Button>
             <span className="hidden text-sm text-muted-foreground sm:inline">{user?.email}</span>
-            <Button variant="ghost" size="icon" onClick={signOut} title="Sair">
+            <Button variant="ghost" size="icon" onClick={async () => {
+                  await signOut();
+                  navigate("/"); 
+                }} title="Sair">
               <LogOut className="h-4 w-4" />
             </Button>
           </div>

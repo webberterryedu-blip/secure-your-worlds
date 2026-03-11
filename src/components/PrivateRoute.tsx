@@ -1,10 +1,8 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import Dashboard from "./Dashboard";
-import Landing from "./Landing";
 import { Shield } from "lucide-react";
 
-export default function Index() {
+export default function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -15,10 +13,9 @@ export default function Index() {
     );
   }
 
-  // Show landing page for unauthenticated users
   if (!user) {
-    return <Landing />;
+    return <Navigate to="/auth" replace />;
   }
 
-  return <Dashboard />;
+  return <>{children}</>;
 }
