@@ -6,6 +6,7 @@ import { Search, Plus, Filter } from "lucide-react";
 import { useCredentialStore, CATEGORY_PROVIDERS, type Credential, type CredentialCategory } from "@/stores/credentialStore";
 import CredentialCard from "@/components/CredentialCard";
 import CredentialCardMicro from "@/components/CredentialCardMicro";
+import { useTranslation } from "react-i18next";
 
 interface CredentialListProps {
   category?: CredentialCategory | "all";
@@ -28,6 +29,7 @@ export function CredentialList({
     credentials,
     toggleFavorite,
   } = useCredentialStore();
+  const { t } = useTranslation();
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
@@ -53,7 +55,7 @@ export function CredentialList({
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Buscar credenciais..."
+            placeholder={t('credential.search')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -69,10 +71,10 @@ export function CredentialList({
             >
               <SelectTrigger className="w-[150px]">
                 <Filter className="mr-2 h-4 w-4" />
-                <SelectValue placeholder="Provedor" />
+                <SelectValue placeholder={t('credential.provider')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
+                <SelectItem value="all">{t('credential.all_providers')}</SelectItem>
                 {availableProviders.map((provider) => (
                   <SelectItem key={provider} value={provider}>
                     {provider}
@@ -86,7 +88,7 @@ export function CredentialList({
           {onAddNew && (
             <Button onClick={onAddNew}>
               <Plus className="mr-2 h-4 w-4" />
-              Nova
+              {t('credential.add_new')}
             </Button>
           )}
         </div>
@@ -94,18 +96,18 @@ export function CredentialList({
 
       {/* Results Count */}
       <div className="text-sm text-muted-foreground">
-        {filteredCredentials.length} credencial{filteredCredentials.length !== 1 ? 'is' : ''} encontrada{filteredCredentials.length !== 1 ? 's' : ''}
+        {filteredCredentials.length} {filteredCredentials.length === 1 ? t('dashboard.credential') : t('dashboard.credentials')} {t('dashboard.found')}
       </div>
 
       {/* Credentials Grid/List */}
       {filteredCredentials.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <div className="text-muted-foreground">
-            <p className="text-lg font-medium">Nenhuma credencial encontrada</p>
+            <p className="text-lg font-medium">{t('dashboard.no_credential_found')}</p>
             <p className="text-sm mt-1">
               {searchQuery || selectedProvider
-                ? "Tente ajustar os filtros de busca"
-                : "Adicione sua primeira credencial"}
+                ? t('dashboard.adjust_filters')
+                : t('dashboard.add_first')}
             </p>
           </div>
         </div>

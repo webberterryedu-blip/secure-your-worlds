@@ -2,6 +2,7 @@ import { useState } from "react";
 import { CredentialList } from "@/components/CredentialList";
 import CredentialFormDynamic from "@/components/CredentialFormDynamic";
 import { useCredentialStore, CATEGORY_LABELS, type CredentialCategory, type Credential } from "@/stores/credentialStore";
+import { useTranslation } from "react-i18next";
 
 interface CategoryPageProps {
   category: CredentialCategory;
@@ -11,6 +12,7 @@ export default function CategoryPage({ category }: CategoryPageProps) {
   const [formOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const { credentials, addCredential, updateCredential } = useCredentialStore();
+  const { t } = useTranslation();
 
   const editingCredential = editingId 
     ? credentials.find(c => c.id === editingId) 
@@ -46,7 +48,7 @@ export default function CategoryPage({ category }: CategoryPageProps) {
       <div>
         <h1 className="text-2xl font-bold">{label}</h1>
         <p className="text-muted-foreground">
-          Gerencie suas credenciais de {label.toLowerCase()}
+          {t('category.manage', { category: label.toLowerCase() })}
         </p>
       </div>
 

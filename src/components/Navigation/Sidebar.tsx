@@ -12,36 +12,31 @@ import {
   User
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { CATEGORY_PROVIDERS, CATEGORY_LABELS, type CredentialCategory } from "@/stores/credentialStore";
+import { CATEGORY_LABELS, type CredentialCategory } from "@/stores/credentialStore";
+import { useTranslation } from "react-i18next";
 
 interface SidebarProps {
   className?: string;
 }
 
-const mainNavItems = [
-  { 
-    to: "/dashboard", 
-    icon: Shield, 
-    label: "Todas" 
-  },
-  { 
-    to: "/identities", 
-    icon: User, 
-    label: "Identidades" 
-  },
-];
-
 const categoryNavItems: { to: string; icon: React.ElementType; label: string; category: CredentialCategory }[] = [
-  { to: "/emails", icon: Mail, label: CATEGORY_LABELS.emails, category: 'emails' },
-  { to: "/development", icon: Code, label: CATEGORY_LABELS.development, category: 'development' },
-  { to: "/cloud", icon: Cloud, label: CATEGORY_LABELS.cloud, category: 'cloud' },
-  { to: "/ai", icon: Bot, label: CATEGORY_LABELS.ai, category: 'ai' },
-  { to: "/social", icon: Users, label: CATEGORY_LABELS.social, category: 'social' },
-  { to: "/financial", icon: Wallet, label: CATEGORY_LABELS.financial, category: 'financial' },
-  { to: "/other", icon: MoreHorizontal, label: CATEGORY_LABELS.other, category: 'other' },
+  { to: "/emails", icon: Mail, label: 'category.emails', category: 'emails' },
+  { to: "/development", icon: Code, label: 'category.development', category: 'development' },
+  { to: "/cloud", icon: Cloud, label: 'category.cloud', category: 'cloud' },
+  { to: "/ai", icon: Bot, label: 'category.ai', category: 'ai' },
+  { to: "/social", icon: Users, label: 'category.social', category: 'social' },
+  { to: "/financial", icon: Wallet, label: 'category.financial', category: 'financial' },
+  { to: "/other", icon: MoreHorizontal, label: 'category.other', category: 'other' },
 ];
 
 export function Sidebar({ className }: SidebarProps) {
+  const { t } = useTranslation();
+  
+  const mainNavItems = [
+    { to: "/dashboard", icon: Shield, label: t('nav.all') },
+    { to: "/identities", icon: User, label: t('nav.identities') },
+  ];
+
   return (
     <aside className={cn("w-64 border-r bg-card", className)}>
       <div className="flex h-16 items-center border-b px-4">
@@ -73,7 +68,7 @@ export function Sidebar({ className }: SidebarProps) {
         
         {/* Category Navigation */}
         <div className="px-3 py-1 text-xs font-semibold text-muted-foreground">
-          Categorias
+          {t('nav.categories')}
         </div>
         
         {categoryNavItems.map((item) => (
@@ -90,7 +85,7 @@ export function Sidebar({ className }: SidebarProps) {
             }
           >
             <item.icon className="h-4 w-4" />
-            {item.label}
+            {t(item.label)}
           </NavLink>
         ))}
       </nav>

@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Plus, User, Trash2, Edit, Mail, Key } from "lucide-react";
 import { useCredentialStore, type Identity } from "@/stores/credentialStore";
+import { useTranslation } from "react-i18next";
 
 export default function Identities() {
   const { 
@@ -19,6 +20,7 @@ export default function Identities() {
     deleteIdentity,
     getCredentialsByIdentity 
   } = useCredentialStore();
+  const { t } = useTranslation();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingIdentity, setEditingIdentity] = useState<Identity | null>(null);
@@ -69,23 +71,23 @@ export default function Identities() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Identidades</h1>
+          <h1 className="text-2xl font-bold">{t('identities.title')}</h1>
           <p className="text-muted-foreground">
-            Agrupe credenciais relacionadas (ex: Pessoal = Gmail + GitHub + OpenAI)
+            {t('identities.subtitle')}
           </p>
         </div>
         <Button onClick={() => handleOpenDialog()}>
           <Plus className="mr-2 h-4 w-4" />
-          Nova Identidade
+          {t('identities.create_identity')}
         </Button>
       </div>
 
       {identities.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <User className="h-12 w-12 text-muted-foreground/30 mb-4" />
-          <p className="text-lg font-medium">Nenhuma identidade criada</p>
+          <p className="text-lg font-medium">{t('identities.no_identities')}</p>
           <p className="text-sm text-muted-foreground mt-1">
-            Crie identidades para agrupar suas credenciais relacionadas
+            {t('identities.create_to_group')}
           </p>
         </div>
       ) : (
@@ -129,7 +131,7 @@ export default function Identities() {
                 <CardContent>
                   <div className="space-y-2">
                     <p className="text-sm font-medium">
-                      {identityCredentials.length} credencial{identityCredentials.length !== 1 ? 'is' : ''}
+                      {identityCredentials.length} {identityCredentials.length !== 1 ? t('identities.credentials_count') : t('identities.credentials_count')}
                     </p>
                     <div className="flex flex-wrap gap-1">
                       {identityCredentials.slice(0, 5).map((cred) => (
@@ -156,32 +158,32 @@ export default function Identities() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingIdentity ? "Editar" : "Nova"} Identidade
+              {editingIdentity ? t('identities.edit_identity') : t('identities.new_identity')}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Nome</Label>
+              <Label>{t('identities.name_label')}</Label>
               <Input 
                 value={name} 
                 onChange={e => setName(e.target.value)} 
-                placeholder="Pessoal, Trabalho, etc." 
+                placeholder={t('identities.name_placeholder')} 
               />
             </div>
             <div className="space-y-2">
-              <Label>Descrição</Label>
+              <Label>{t('identities.description_label')}</Label>
               <Textarea 
                 value={description} 
                 onChange={e => setDescription(e.target.value)} 
-                placeholder="Descrição opcional..." 
+                placeholder={t('identities.description_placeholder')} 
               />
             </div>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setDialogOpen(false)}>
-                Cancelar
+                {t('identities.cancel')}
               </Button>
               <Button onClick={handleSave} disabled={!name}>
-                Salvar
+                {t('identities.save')}
               </Button>
             </div>
           </div>
@@ -192,15 +194,15 @@ export default function Identities() {
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir Identidade</AlertDialogTitle>
+            <AlertDialogTitle>{t('identities.delete_identity')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir esta identidade? Esta ação não pode ser desfeita.
+              {t('identities.delete_warning')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('identities.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Excluir
+              {t('identities.save')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

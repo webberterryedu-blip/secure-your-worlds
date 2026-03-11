@@ -111,7 +111,85 @@ const resources = {
       "auth.password_complexity": "Password must include uppercase, lowercase, number and special character",
       "auth.show_password": "Show password",
       "auth.hide_password": "Hide password",
-      "auth.back": "Back"
+      "auth.back": "Back",
+
+      // Dashboard
+      "dashboard.title": "Dashboard",
+      "dashboard.welcome": "Welcome back",
+      "dashboard.total_credentials": "Total Credentials",
+      "dashboard.expiring_soon": "Expiring Soon",
+      "dashboard.expired": "Expired",
+      "dashboard.favorites": "Favorites",
+      "dashboard.all_credentials": "All Credentials",
+      "dashboard.recent_activity": "Recent Activity",
+      "dashboard.search_placeholder": "Search credentials...",
+      "dashboard.filter_all": "All",
+      "dashboard.filter_favorites": "Favorites",
+      "dashboard.no_credentials": "No credentials yet",
+      "dashboard.no_results": "No results",
+      "dashboard.add_first": "Add your first credential to get started",
+      "dashboard.adjust_filters": "Try adjusting the filters",
+      "dashboard.credentials": "credentials",
+      "dashboard.credential": "credential",
+      "dashboard.found": "found",
+      "dashboard.no_credential_found": "No credential found",
+      "dashboard.add_new_credential": "Add New Credential",
+
+      // Identities
+      "identities.title": "Identities",
+      "identities.subtitle": "Group related credentials together (e.g., Personal = Gmail + GitHub + OpenAI)",
+      "identities.create_identity": "Create Identity",
+      "identities.no_identities": "No identities created",
+      "identities.create_to_group": "Create identities to group your related credentials",
+      "identities.credentials_count": "credentials",
+      "identities.new_identity": "New Identity",
+      "identities.edit_identity": "Edit Identity",
+      "identities.name_label": "Name",
+      "identities.name_placeholder": "Personal, Work, etc.",
+      "identities.description_label": "Description",
+      "identities.description_placeholder": "Optional description...",
+      "identities.cancel": "Cancel",
+      "identities.save": "Save",
+      "identities.delete_identity": "Delete Identity",
+      "identities.delete_warning": "Are you sure you want to delete this identity? This action cannot be undone.",
+
+      // Categories
+      "category.emails": "E-mails",
+      "category.development": "Development",
+      "category.cloud": "Cloud",
+      "category.ai": "Artificial Intelligence",
+      "category.social": "Social Networks",
+      "category.financial": "Financial",
+      "category.other": "Other",
+      "category.manage": "Manage your {{category}} credentials",
+
+      // Credentials Form
+      "credential.new": "New",
+      "credential.edit": "Edit",
+      "credential.name": "Name",
+      "credential.name_placeholder": "My credential",
+      "credential.email": "Email",
+      "credential.email_placeholder": "user@email.com",
+      "credential.url": "URL",
+      "credential.url_placeholder": "https://...",
+      "credential.description": "Description",
+      "credential.notes": "Notes",
+      "credential.notes_placeholder": "Additional information...",
+      "credential.favorite": "Favorite",
+      "credential.cancel": "Cancel",
+      "credential.save": "Save",
+
+      // Credential List
+      "credential.search": "Search credentials...",
+      "credential.add_new": "New",
+      "credential.provider": "Provider",
+      "credential.all_providers": "All",
+      "credential.filter_provider": "Filter by provider",
+
+      // Navigation
+      "nav.all": "All",
+      "nav.identities": "Identities",
+      "nav.categories": "Categories"
     }
   },
   pt: {
@@ -222,7 +300,85 @@ const resources = {
       "auth.password_complexity": "A senha deve ter letras maiúsculas, minúsculas, números e caracteres especiais",
       "auth.show_password": "Mostrar senha",
       "auth.hide_password": "Ocultar senha",
-      "auth.back": "Voltar"
+      "auth.back": "Voltar",
+
+      // Dashboard
+      "dashboard.title": "Painel",
+      "dashboard.welcome": "Bem-vindo de volta",
+      "dashboard.total_credentials": "Total de Credenciais",
+      "dashboard.expiring_soon": "Expirando em Breve",
+      "dashboard.expired": "Expiradas",
+      "dashboard.favorites": "Favoritas",
+      "dashboard.all_credentials": "Todas as Credenciais",
+      "dashboard.recent_activity": "Atividade Recente",
+      "dashboard.search_placeholder": "Buscar credenciais...",
+      "dashboard.filter_all": "Todas",
+      "dashboard.filter_favorites": "Favoritas",
+      "dashboard.no_credentials": "Nenhuma credencial ainda",
+      "dashboard.no_results": "Nenhum resultado",
+      "dashboard.add_first": "Adicione sua primeira credencial para começar",
+      "dashboard.adjust_filters": "Tente ajustar os filtros",
+      "dashboard.credentials": "credenciais",
+      "dashboard.credential": "credencial",
+      "dashboard.found": "encontrada",
+      "dashboard.no_credential_found": "Nenhuma credencial encontrada",
+      "dashboard.add_new_credential": "Adicionar Nova Credencial",
+
+      // Identities
+      "identities.title": "Identidades",
+      "identities.subtitle": "Agrupe credenciais relacionadas (ex: Pessoal = Gmail + GitHub + OpenAI)",
+      "identities.create_identity": "Criar Identidade",
+      "identities.no_identities": "Nenhuma identidade criada",
+      "identities.create_to_group": "Crie identidades para agrupar suas credenciais relacionadas",
+      "identities.credentials_count": "credenciais",
+      "identities.new_identity": "Nova Identidade",
+      "identities.edit_identity": "Editar Identidade",
+      "identities.name_label": "Nome",
+      "identities.name_placeholder": "Pessoal, Trabalho, etc.",
+      "identities.description_label": "Descrição",
+      "identities.description_placeholder": "Descrição opcional...",
+      "identities.cancel": "Cancelar",
+      "identities.save": "Salvar",
+      "identities.delete_identity": "Excluir Identidade",
+      "identities.delete_warning": "Tem certeza que deseja excluir esta identidade? Esta ação não pode ser desfeita.",
+
+      // Categories
+      "category.emails": "E-mails",
+      "category.development": "Desenvolvimento",
+      "category.cloud": "Cloud",
+      "category.ai": "Inteligência Artificial",
+      "category.social": "Redes Sociais",
+      "category.financial": "Financeiro",
+      "category.other": "Outros",
+      "category.manage": "Gerencie suas credenciais de {{category}}",
+
+      // Credentials Form
+      "credential.new": "Nova",
+      "credential.edit": "Editar",
+      "credential.name": "Nome",
+      "credential.name_placeholder": "Minha credencial",
+      "credential.email": "E-mail",
+      "credential.email_placeholder": "user@email.com",
+      "credential.url": "URL",
+      "credential.url_placeholder": "https://...",
+      "credential.description": "Descrição",
+      "credential.notes": "Notas",
+      "credential.notes_placeholder": "Informações adicionais...",
+      "credential.favorite": "Favorito",
+      "credential.cancel": "Cancelar",
+      "credential.save": "Salvar",
+
+      // Credential List
+      "credential.search": "Buscar credenciais...",
+      "credential.add_new": "Nova",
+      "credential.provider": "Provedor",
+      "credential.all_providers": "Todos",
+      "credential.filter_provider": "Filtrar por provedor",
+
+      // Navigation
+      "nav.all": "Todas",
+      "nav.identities": "Identidades",
+      "nav.categories": "Categorias"
     }
   }
 };
