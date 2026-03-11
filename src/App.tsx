@@ -47,7 +47,8 @@ const App = () => (
               {/* Auth - pública (login/register) */}
               <Route path="/auth" element={<Auth />} />
 
-              {/* Dashboard com Sidebar - protegido */}
+              {/* ==================== DASHBOARD ROUTES ==================== */}
+              {/* Dashboard - direto (protegido) */}
               <Route
                 path="/dashboard"
                 element={
@@ -57,17 +58,9 @@ const App = () => (
                 }
               >
                 <Route index element={<Dashboard />} />
-                <Route path="identities" element={<Identities />} />
-                <Route path="emails" element={<EmailsPage />} />
-                <Route path="development" element={<DevelopmentPage />} />
-                <Route path="cloud" element={<CloudPage />} />
-                <Route path="ai" element={<AIPage />} />
-                <Route path="social" element={<SocialPage />} />
-                <Route path="financial" element={<FinancialPage />} />
-                <Route path="other" element={<OtherPage />} />
               </Route>
 
-              {/* Identities - proteção direta (acesso via /identities) */}
+              {/* Identities - direto (protegido) */}
               <Route
                 path="/identities"
                 element={
@@ -79,6 +72,111 @@ const App = () => (
                 <Route index element={<Identities />} />
               </Route>
 
+              {/* Emails - direto (protegido) */}
+              <Route
+                path="/emails"
+                element={
+                  <PrivateRoute>
+                    <MainLayout />
+                  </PrivateRoute>
+                }
+              >
+                <Route index element={<EmailsPage />} />
+              </Route>
+
+              {/* Development - direto (protegido) */}
+              <Route
+                path="/development"
+                element={
+                  <PrivateRoute>
+                    <MainLayout />
+                  </PrivateRoute>
+                }
+              >
+                <Route index element={<DevelopmentPage />} />
+              </Route>
+
+              {/* Cloud - direto (protegido) */}
+              <Route
+                path="/cloud"
+                element={
+                  <PrivateRoute>
+                    <MainLayout />
+                  </PrivateRoute>
+                }
+              >
+                <Route index element={<CloudPage />} />
+              </Route>
+
+              {/* AI - direto (protegido) */}
+              <Route
+                path="/ai"
+                element={
+                  <PrivateRoute>
+                    <MainLayout />
+                  </PrivateRoute>
+                }
+              >
+                <Route index element={<AIPage />} />
+              </Route>
+
+              {/* Social - direto (protegido) */}
+              <Route
+                path="/social"
+                element={
+                  <PrivateRoute>
+                    <MainLayout />
+                  </PrivateRoute>
+                }
+              >
+                <Route index element={<SocialPage />} />
+              </Route>
+
+              {/* Financial - direto (protegido) */}
+              <Route
+                path="/financial"
+                element={
+                  <PrivateRoute>
+                    <MainLayout />
+                  </PrivateRoute>
+                }
+              >
+                <Route index element={<FinancialPage />} />
+              </Route>
+
+              {/* Other - direto (protegido) */}
+              <Route
+                path="/other"
+                element={
+                  <PrivateRoute>
+                    <MainLayout />
+                  </PrivateRoute>
+                }
+              >
+                <Route index element={<OtherPage />} />
+              </Route>
+
+              {/* ==================== LEGACY NESTED ROUTES (for backwards compatibility) ==================== */}
+              {/* Mantido para compatibilidade com links antigos */}
+              <Route
+                path="/dashboard"
+                element={
+                  <PrivateRoute>
+                    <MainLayout />
+                  </PrivateRoute>
+                }
+              >
+                <Route path="identities" element={<Identities />} />
+                <Route path="emails" element={<EmailsPage />} />
+                <Route path="development" element={<DevelopmentPage />} />
+                <Route path="cloud" element={<CloudPage />} />
+                <Route path="ai" element={<AIPage />} />
+                <Route path="social" element={<SocialPage />} />
+                <Route path="financial" element={<FinancialPage />} />
+                <Route path="other" element={<OtherPage />} />
+              </Route>
+
+              {/* ==================== SECRETS VAULT ROUTES ==================== */}
               {/* Secrets Vault - protegido por múltiplas camadas de autenticação */}
               <Route
                 path="/secrets/setup"
