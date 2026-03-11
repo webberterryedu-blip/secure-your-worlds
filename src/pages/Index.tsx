@@ -9,7 +9,7 @@ export default function Index() {
 
   if (loading) {
     return (
-      <div className="dark flex min-h-screen items-center justify-center bg-background">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <Shield className="h-8 w-8 animate-pulse text-primary" />
       </div>
     );

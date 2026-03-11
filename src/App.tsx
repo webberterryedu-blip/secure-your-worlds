@@ -13,6 +13,8 @@ import NotFound from "./pages/NotFound";
 import SecretsUnlock from "./pages/SecretsUnlock";
 import SecretsSetup from "./pages/SecretsSetup";
 import SecretsDashboard from "./pages/SecretsDashboard";
+import SecuritySettings from "./pages/SecuritySettings";
+import TwoFactorVerifyPage from "./pages/TwoFactorVerifyPage";
 
 import MainLayout from "./components/Layout/MainLayout";
 import Identities from "./pages/Identities";
@@ -46,6 +48,9 @@ const App = () => (
 
               {/* Auth - pública (login/register) */}
               <Route path="/auth" element={<Auth />} />
+
+              {/* 2FA Verification - pública mas requer usuário logado */}
+              <Route path="/auth/2fa-verify" element={<TwoFactorVerifyPage />} />
 
               {/* ==================== DASHBOARD ROUTES ==================== */}
               {/* Dashboard - direto (protegido) */}
@@ -154,6 +159,18 @@ const App = () => (
                 }
               >
                 <Route index element={<OtherPage />} />
+              </Route>
+
+              {/* Security Settings - protegido */}
+              <Route
+                path="/settings/security"
+                element={
+                  <PrivateRoute>
+                    <MainLayout />
+                  </PrivateRoute>
+                }
+              >
+                <Route index element={<SecuritySettings />} />
               </Route>
 
               {/* ==================== LEGACY NESTED ROUTES (for backwards compatibility) ==================== */}

@@ -9,7 +9,8 @@ import {
   Wallet, 
   MoreHorizontal,
   Key,
-  User
+  User,
+  Settings
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CATEGORY_LABELS, type CredentialCategory } from "@/stores/credentialStore";
@@ -35,6 +36,7 @@ export function Sidebar({ className }: SidebarProps) {
   const mainNavItems = [
     { to: "/dashboard", icon: Shield, label: t('nav.all') },
     { to: "/identities", icon: User, label: t('nav.identities') },
+    { to: "/settings/security", icon: Settings, label: t('nav.settings') || 'Security' },
   ];
 
   return (
