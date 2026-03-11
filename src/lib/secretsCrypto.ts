@@ -8,7 +8,7 @@ import { base64UrlToUint8Array, uint8ArrayToBase64Url, deriveKey, generateSalt }
 
 const ALGORITHM_AES_GCM = 'AES-GCM';
 const ALGORITHM_PBKDF2 = 'PBKDF2';
-const ITERATIONS = 100000;
+const ITERATIONS = 600000;
 const KEY_LENGTH = 256;
 const HASH_ALGORITHM = 'SHA-256';
 

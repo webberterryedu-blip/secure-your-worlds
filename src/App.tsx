@@ -14,6 +14,18 @@ import SecretsUnlock from "./pages/SecretsUnlock";
 import SecretsSetup from "./pages/SecretsSetup";
 import SecretsDashboard from "./pages/SecretsDashboard";
 
+import MainLayout from "./components/Layout/MainLayout";
+import Identities from "./pages/Identities";
+import {
+  EmailsPage,
+  DevelopmentPage,
+  CloudPage,
+  AIPage,
+  SocialPage,
+  FinancialPage,
+  OtherPage,
+} from "./pages/CategoryPage";
+
 import PrivateRoute from "./components/PrivateRoute";
 import SecretsAuth from "./components/SecretsAuth";
 
@@ -35,15 +47,25 @@ const App = () => (
               {/* Auth - pública (login/register) */}
               <Route path="/auth" element={<Auth />} />
 
-              {/* Dashboard - protegido */}
+              {/* Dashboard com Sidebar - protegido */}
               <Route
                 path="/dashboard"
                 element={
                   <PrivateRoute>
-                    <Dashboard />
+                    <MainLayout />
                   </PrivateRoute>
                 }
-              />
+              >
+                <Route index element={<Dashboard />} />
+                <Route path="identities" element={<Identities />} />
+                <Route path="emails" element={<EmailsPage />} />
+                <Route path="development" element={<DevelopmentPage />} />
+                <Route path="cloud" element={<CloudPage />} />
+                <Route path="ai" element={<AIPage />} />
+                <Route path="social" element={<SocialPage />} />
+                <Route path="financial" element={<FinancialPage />} />
+                <Route path="other" element={<OtherPage />} />
+              </Route>
 
               {/* Secrets Vault - protegido por múltiplas camadas de autenticação */}
               <Route

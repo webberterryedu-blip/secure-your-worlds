@@ -71,7 +71,7 @@ const resources = {
       "cta.button": "Create Free Account",
       
       // Footer
-      "footer.copyright": "© 2024 Secure Your Worlds. Open source.",
+      "footer.copyright": "© 2024 VaultKey. Open source.",
       
       // Auth
       "auth.login": "Sign In",
@@ -182,7 +182,7 @@ const resources = {
       "cta.button": "Criar Conta Grátis",
       
       // Footer
-      "footer.copyright": "© 2024 Secure Your Worlds. Open source.",
+      "footer.copyright": "© 2024 VaultKey. Open source.",
       
       // Auth
       "auth.login": "Entrar",

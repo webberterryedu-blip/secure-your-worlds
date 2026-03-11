@@ -23,6 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 
+# Environment files - sensitive
+.env
+.env.local
+.env.*.local
+
 # Render verification files
 *render*.txt
 *dashboard*.txt

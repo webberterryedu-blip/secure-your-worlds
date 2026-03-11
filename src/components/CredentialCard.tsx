@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, Copy, Star, Trash2, Pencil, Mail, Users, Code, Wallet, ExternalLink, Globe, Briefcase } from "lucide-react";
 import { toast } from "sonner";
 import { differenceInDays } from "date-fns";
-import type { Credential } from "@/hooks/useCredentials";
+import type { Credential } from "@/stores/credentialStore";
 
 // Service detection mapping from URL hostname
 const SERVICE_MAP: Record<string, string> = {
@@ -140,21 +140,25 @@ interface Props {
   credential: Credential;
   onEdit: (c: Credential) => void;
   onDelete: (id: string) => void;
-  onToggleFavorite: (p: { id: string; is_favorite: boolean }) => void;
+  onToggleFavorite: (p: { id: string; isFavorite: boolean }) => void;
 }
 
 export default function CredentialCard({ credential, onEdit, onDelete, onToggleFavorite }: Props) {
   const [showPassword, setShowPassword] = useState(false);
   const c = credential;
 
-  // Detect service from URL or use provided service field
-  const detectedService = getServiceFromUrl(c.url) || c.service;
+  // Handle both isFavorite (new) and is_favorite (legacy)
+  const isFavorite = c.isFavorite ?? c.is_favorite ?? false;
+  
+  // Detect service from URL or use provided service field (supports both provider and service)
+  const detectedService = getServiceFromUrl(c.url || '') || c.provider || c.service || '';
   
   // Format URL for display
-  const displayUrl = formatUrl(c.url);
+  const displayUrl = formatUrl(c.url || '');
 
-  // Calculate expiry info
-  const daysUntilExpiry = c.expires_at ? differenceInDays(new Date(c.expires_at), new Date()) : null;
+  // Calculate expiry info - support both expires_at and tokenExpiration
+  const expiresAt = c.expires_at || c.tokenExpiration;
+  const daysUntilExpiry = expiresAt ? differenceInDays(new Date(expiresAt), new Date()) : null;
   const isExpiringSoon = daysUntilExpiry !== null && daysUntilExpiry <= 30 && daysUntilExpiry > 0;
   const isExpired = daysUntilExpiry !== null && daysUntilExpiry <= 0;
 
@@ -191,18 +195,18 @@ export default function CredentialCard({ credential, onEdit, onDelete, onToggleF
             </div>
           </div>
           <button
-            onClick={() => onToggleFavorite({ id: c.id, is_favorite: c.is_favorite })}
+            onClick={() => onToggleFavorite({ id: c.id, isFavorite })}
             className="shrink-0"
           >
-            <Star className={`h-5 w-5 transition-colors ${c.is_favorite ? "fill-primary text-primary" : "text-muted-foreground/40 hover:text-primary"}`} />
+            <Star className={`h-5 w-5 transition-colors ${isFavorite ? "fill-primary text-primary" : "text-muted-foreground/40 hover:text-primary"}`} />
           </button>
         </div>
 
         {/* LINE 2: Email or alternative username in smaller muted text */}
-        {(c.email || c.nick) && (
+        {(c.email || c.username || c.nick) && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Mail className="h-3.5 w-3.5 shrink-0" />
-            <span className="truncate">{c.email || c.nick}</span>
+            <span className="truncate">{c.email || c.username || c.nick}</span>
           </div>
         )}
 
@@ -222,12 +226,18 @@ export default function CredentialCard({ credential, onEdit, onDelete, onToggleF
         {/* LINE 4: Password field with toggle eye and copy button */}
         <div className="flex items-center gap-2">
           <div className="flex-1 rounded-md bg-muted px-3 py-1.5 font-mono text-sm truncate">
-            {showPassword ? c.password : "••••••••••••••"}
+            {showPassword ? (c.password || c.secretKey || c.patToken || c.apiKey || '••••••••') : "••••••••••••"}
           </div>
           <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => setShowPassword(!showPassword)}>
             {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => copyText(c.password, "Senha")}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => {
+            const credValue = c.password || c.secretKey || c.patToken || c.apiKey || '';
+            if (!credValue && import.meta.env.DEV) {
+              console.warn('No credential value found for entry:', c.id, c.nick);
+            }
+            copyText(credValue, "Senha");
+          }}>
             <Copy className="h-3.5 w-3.5" />
           </Button>
         </div>
@@ -267,7 +277,8 @@ export default function CredentialCard({ credential, onEdit, onDelete, onToggleF
         </div>
 
         {/* Additional metadata - devices and projects */}
-        {(c.devices.length > 0 || (c.projects && c.projects.length > 0)) && (
+        {/* Devices and Projects - only show for legacy credentials with data */}
+        {(c.devices && c.devices.length > 0 || c.projects && c.projects.length > 0) && (
           <div className="flex flex-wrap gap-1.5 pt-2 border-t border-border/50">
             {c.environment && (
               <Badge variant="secondary" className="text-[10px] gap-1">
@@ -275,15 +286,15 @@ export default function CredentialCard({ credential, onEdit, onDelete, onToggleF
                 {ENVIRONMENTS[c.environment as keyof typeof ENVIRONMENTS]?.label || c.environment}
               </Badge>
             )}
-            {c.devices.slice(0, 2).map((d) => (
+            {c.devices?.slice(0, 2).map((d) => (
               <Badge key={d} variant="outline" className="text-[10px]">
                 {d}
               </Badge>
             ))}
-            {c.devices.length > 2 && (
+            {c.devices && c.devices.length > 2 && (
               <Badge variant="outline" className="text-[10px]">+{c.devices.length - 2}</Badge>
             )}
-            {c.projects && c.projects.slice(0, 2).map((p) => (
+            {c.projects?.slice(0, 2).map((p) => (
               <Badge key={p} variant="outline" className="text-[10px] border-emerald-500/30 text-emerald-400">
                 {p}
               </Badge>
