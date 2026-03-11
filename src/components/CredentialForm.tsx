@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,25 +23,59 @@ interface Props {
 }
 
 export default function CredentialForm({ open, onClose, onSubmit, initial }: Props) {
-  const [nick, setNick] = useState(initial?.nick ?? "");
-  const [email, setEmail] = useState(initial?.email ?? "");
-  const [password, setPassword] = useState(initial?.password ?? "");
-  const [description, setDescription] = useState(initial?.description ?? "");
-  const [category, setCategory] = useState(initial?.category ?? "E-mails");
-  const [devices, setDevices] = useState<string[]>(initial?.devices ?? []);
-  const [url, setUrl] = useState(initial?.url ?? "");
-  const [notes, setNotes] = useState(initial?.notes ?? "");
-  const [expiresAt, setExpiresAt] = useState(initial?.expires_at?.slice(0, 10) ?? "");
+  const [nick, setNick] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("E-mails");
+  const [devices, setDevices] = useState<string[]>([]);
+  const [url, setUrl] = useState("");
+  const [notes, setNotes] = useState("");
+  const [expiresAt, setExpiresAt] = useState("");
   
   // New fields
-  const [service, setService] = useState(initial?.service ?? "");
-  const [serviceUrl, setServiceUrl] = useState(initial?.service_url ?? "");
-  const [environment, setEnvironment] = useState<string>(initial?.environment ?? "personal");
-  const [projects, setProjects] = useState<string[]>(initial?.projects ?? []);
+  const [service, setService] = useState("");
+  const [serviceUrl, setServiceUrl] = useState("");
+  const [environment, setEnvironment] = useState<string>("personal");
+  const [projects, setProjects] = useState<string[]>([]);
   const [newProject, setNewProject] = useState("");
   
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  // Sync form with initial credential data when it changes
+  useEffect(() => {
+    if (initial) {
+      setNick(initial.nick ?? "");
+      setEmail(initial.email ?? "");
+      setPassword(initial.password ?? "");
+      setDescription(initial.description ?? "");
+      setCategory(initial.category ?? "E-mails");
+      setDevices(initial.devices ?? []);
+      setUrl(initial.url ?? "");
+      setNotes(initial.notes ?? "");
+      setExpiresAt(initial.expires_at?.slice(0, 10) ?? "");
+      setService(initial.service ?? "");
+      setServiceUrl(initial.service_url ?? "");
+      setEnvironment(initial.environment ?? "personal");
+      setProjects(initial.projects ?? []);
+    } else {
+      // Reset form when opening for new credential
+      setNick("");
+      setEmail("");
+      setPassword("");
+      setDescription("");
+      setCategory("E-mails");
+      setDevices([]);
+      setUrl("");
+      setNotes("");
+      setExpiresAt("");
+      setService("");
+      setServiceUrl("");
+      setEnvironment("personal");
+      setProjects([]);
+    }
+  }, [initial, open]);
 
   const strength = getPasswordStrength(password);
 
