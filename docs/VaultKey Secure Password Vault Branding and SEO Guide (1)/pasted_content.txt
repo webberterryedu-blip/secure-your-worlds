@@ -1,0 +1,197 @@
+Entendi perfeitamente o que você quer melhorar no **Dashboard** do VaultKey.
+
+Atualmente, os cards mostram pouca informação contextual: só o nick/título, e-mail (às vezes repetido), senha mascarada, categoria e alguns ícones de ação. Isso deixa o usuário sem saber rapidamente **o que** aquela credencial representa (ex.: "essa é minha conta LinkedIn pessoal", "esse é o GitHub da empresa", "esse é o login do AWS production").
+
+### Objetivo principal
+Tornar cada **CredentialCard** mais informativo e autoexplicativo, destacando:
+
+- O **serviço/plataforma** claro (LinkedIn, GitHub, AWS, etc.)
+- O **username/nick** específico daquela conta
+- O **e-mail** associado (se diferente do geral ou relevante)
+- URL (quando existir), talvez como link clicável ou tooltip
+- Manter o resto (senha oculta, ações, categoria, favorito, expiração se tiver)
+
+Sem sobrecarregar o card visualmente — usar hierarquia de texto (título grande, subtítulos menores, ícones).
+
+### Sugestão de layout aprimorado para o CredentialCard
+
+Estrutura recomendada (de cima para baixo):
+
+1. **Título principal** (grande, bold) → nick + serviço quando possível  
+   Ex.: "mauro.lima" • LinkedIn  
+   ou "webberterryedu-blip" • GitHub
+
+2. **Subtítulo / Detalhe principal** (menor, muted) → e-mail ou username alternativo  
+   Ex.: mauro.lima@educacao.am.gov.br  
+   ou weber@company.com (se for diferente)
+
+3. **URL** (se existir) → como texto clicável pequeno ou ícone + tooltip  
+   Ex.: linkedin.com/in/mauro-lima
+
+4. **Senha** (mascarada, com toggle eye + copy)
+
+5. **Badge da categoria** (E-mails, Projetos/Dev, etc.) + ícone
+
+6. **Ações** (favorito, edit, delete, copy email/url)
+
+Exemplos concretos baseados nas suas credenciais:
+
+- Card LinkedIn  
+  **mauro.lima • LinkedIn**  
+  mauro.lima@educacao.am.gov.br  
+  linkedin.com/in/mauro-lima (clicável)  
+  •••••••••• (com eye/copy)
+
+- Card GitHub  
+  **webberterryedu-blip • GitHub**  
+  weber.terry.edu@gmail.com  
+  github.com/webberterryedu-blip (clicável)  
+  ••••••••••
+
+- Card "Pink webbberterryedu-blip"  
+  Assumindo que é um nick de e-mail/social → **Pink • [serviço ou tipo]**  
+  weber.terry.edu@gmail.com
+
+### Como implementar (mudanças no código)
+
+Principalmente em `CredentialCard.tsx`
+
+#### 1. Ajuste no tipo Credential (hooks/useCredentials.ts)
+Adicione ou use campos que já existem:
+
+```ts
+export interface Credential {
+  id: string;
+  nick: string;              // ← usar como "username" ou "identificador na plataforma"
+  email?: string;
+  password: string;
+  url?: string;              // ← importante para link
+  category: string;
+  description?: string;      // ← pode mostrar se for útil
+  // ... outros campos
+}
+```
+
+#### 2. Novo componente de header no card (exemplo)
+
+Substitua o conteúdo atual do CardContent por algo assim:
+
+```tsx
+<CardContent className="p-4 flex flex-col gap-3">
+  {/* Linha 1: Título + plataforma inferida */}
+  <div className="flex items-start justify-between">
+    <div>
+      <h3 className="font-semibold text-base leading-tight">
+        {credential.nick}
+        {credential.url && getServiceFromUrl(credential.url) && (
+          <> • {getServiceFromUrl(credential.url)}</>
+        )}
+      </h3>
+      
+      {/* Linha 2: E-mail ou descrição */}
+      {credential.email && (
+        <p className="text-sm text-muted-foreground mt-0.5">
+          {credential.email}
+        </p>
+      )}
+      
+      {/* Linha 3: URL clicável */}
+      {credential.url && (
+        <a
+          href={credential.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-primary hover:underline mt-1 inline-flex items-center gap-1"
+        >
+          <ExternalLink className="h-3 w-3" />
+          {formatUrl(credential.url)}
+        </a>
+      )}
+    </div>
+
+    {/* Favorito */}
+    <Button
+      variant="ghost"
+      size="icon"
+      className="h-8 w-8 -mt-1 -mr-1"
+      onClick={() => onToggleFavorite({ id: credential.id, is_favorite: !credential.is_favorite })}
+    >
+      <Star className={cn("h-4 w-4", credential.is_favorite ? "fill-primary text-primary" : "")} />
+    </Button>
+  </div>
+
+  {/* Senha */}
+  <div className="flex items-center gap-2 bg-muted/50 p-2 rounded border">
+    <code className="flex-1 font-mono text-sm tracking-wide">
+      {showPassword ? credential.password : "•••••••••••••••"}
+    </code>
+    <div className="flex gap-1">
+      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setShowPassword(!showPassword)}>
+        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+      </Button>
+      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => copyText(credential.password, "Senha")}>
+        <Copy className="h-4 w-4" />
+      </Button>
+    </div>
+  </div>
+
+  {/* Footer: categoria + ações */}
+  <div className="flex items-center justify-between pt-2 border-t">
+    <Badge variant="outline" className="text-xs">
+      {CATEGORY_ICON[credential.category] || <Tag className="h-3 w-3 mr-1" />}
+      {credential.category}
+    </Badge>
+
+    <div className="flex gap-1">
+      {credential.url && (
+        <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+          <a href={credential.url} target="_blank" rel="noopener noreferrer">
+            <ExternalLink className="h-4 w-4" />
+          </a>
+        </Button>
+      )}
+      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(credential)}>
+        <Pencil className="h-4 w-4" />
+      </Button>
+      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => onDelete(credential.id)}>
+        <Trash2 className="h-4 w-4" />
+      </Button>
+    </div>
+  </div>
+</CardContent>
+```
+
+#### 3. Funções auxiliares (adicione em lib/utils ou no próprio componente)
+
+```ts
+function getServiceFromUrl(url?: string): string | null {
+  if (!url) return null;
+  try {
+    const hostname = new URL(url).hostname.toLowerCase();
+    if (hostname.includes("linkedin")) return "LinkedIn";
+    if (hostname.includes("github")) return "GitHub";
+    if (hostname.includes("aws.amazon")) return "AWS";
+    if (hostname.includes("google")) return "Google";
+    // ... adicione mais conforme necessário
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function formatUrl(url: string): string {
+  try {
+    const u = new URL(url);
+    return u.hostname + (u.pathname.length > 1 ? u.pathname : "");
+  } catch {
+    return url;
+  }
+}
+```
+
+### Próximos passos sugeridos
+1. Implemente primeiro o layout acima no `CredentialCard.tsx` → teste visual no dashboard.
+2. Preencha os campos `nick`, `url`, `email` corretamente ao criar/editar credenciais (no `CredentialForm.tsx` você já tem campos para isso).
+3. Se quiser ir além: no form de criação, adicionar um campo "Serviço/Plataforma" (select com opções comuns: LinkedIn, GitHub, AWS, Gmail, etc.) que preenche automaticamente o título do card.
+
+Quer que eu ajuste alguma parte específica desse código (ex.: mais compacto, outra disposição, ícones diferentes)? Ou prefere focar primeiro no form para facilitar inserir esses dados? Me avise!

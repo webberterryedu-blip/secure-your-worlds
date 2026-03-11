@@ -15,6 +15,8 @@ import SecretsSetup from "./pages/SecretsSetup";
 import SecretsDashboard from "./pages/SecretsDashboard";
 import SecuritySettings from "./pages/SecuritySettings";
 import TwoFactorVerifyPage from "./pages/TwoFactorVerifyPage";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 import MainLayout from "./components/Layout/MainLayout";
 import Identities from "./pages/Identities";
@@ -51,6 +53,12 @@ const App = () => (
 
               {/* 2FA Verification - pública mas requer usuário logado */}
               <Route path="/auth/2fa-verify" element={<TwoFactorVerifyPage />} />
+
+              {/* Forgot Password - pública */}
+              <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+
+              {/* Reset Password - pública */}
+              <Route path="/auth/reset-password" element={<ResetPassword />} />
 
               {/* ==================== DASHBOARD ROUTES ==================== */}
               {/* Dashboard - direto (protegido) */}

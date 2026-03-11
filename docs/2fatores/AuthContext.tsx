@@ -1,7 +1,9 @@
+
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { Navigate } from "react-router-dom";
+import { useVaultStore } from "@/store/vaultStore";
 
 interface AuthContextType {
   session: Session | null;
@@ -10,8 +12,6 @@ interface AuthContextType {
   signUp: (email: string, password: string, displayName?: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
-  sendPasswordResetEmail: (email: string) => Promise<void>;
-  updateUserPassword: (newPassword: string) => Promise<{ user: User | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -59,40 +59,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error;
   };
 
-  const sendPasswordResetEmail = async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/reset-password`,
-    });
-    if (error) {
-      toast.error(`Error sending recovery email: ${error.message}`);
-      throw error;
-    }
-    toast.success("Recovery email sent! Check your inbox.");
-  };
-
-  const updateUserPassword = async (newPassword: string) => {
-    const { data, error } = await supabase.auth.updateUser({
-      password: newPassword,
-    });
-    if (error) {
-      toast.error(`Error updating password: ${error.message}`);
-      throw error;
-    }
-    toast.success("Password updated successfully!");
-    return data;
-  };
-
   return (
-    <AuthContext.Provider value={{ 
-      session, 
-      user, 
-      loading, 
-      signUp, 
-      signIn, 
-      signOut,
-      sendPasswordResetEmail,
-      updateUserPassword
-    }}>
+    <AuthContext.Provider value={{ session, user, loading, signUp, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
@@ -102,4 +70,28 @@ export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth must be used within AuthProvider");
   return context;
+}
+
+interface PrivateRouteProps {
+  children: ReactNode;
+}
+
+export function PrivateRoute({ children }: PrivateRouteProps) {
+  const { user, loading } = useAuth();
+  const { is2FAEnabled, is2FAVerified } = useVaultStore();
+
+  if (loading) {
+    return <div>Carregando...</div>; // Ou um spinner/skeleton
+  }
+
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  // Se 2FA estiver habilitado e não verificado para a sessão atual, redireciona para a verificação
+  if (is2FAEnabled && !is2FAVerified) {
+    return <Navigate to="/auth/2fa-verify" replace />;
+  }
+
+  return <>{children}</>;
 }

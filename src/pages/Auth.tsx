@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Shield, Lock, Eye, EyeOff, ArrowLeft, Check, X } from "lucide-react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { evaluatePasswordStrength } from "@/lib/crypto";
@@ -238,6 +239,16 @@ export default function Auth() {
                 )}
               </Button>
             </form>
+            {isLogin && (
+              <div className="mt-4 text-center">
+                <Link
+                  to="/auth/forgot-password"
+                  className="text-sm text-muted-foreground hover:text-primary hover:underline"
+                >
+                  Esqueceu a senha?
+                </Link>
+              </div>
+            )}
             <div className="mt-4 text-center text-sm text-muted-foreground">
               {isLogin ? "Não tem conta?" : "Já tem conta?"}{" "}
               <button
