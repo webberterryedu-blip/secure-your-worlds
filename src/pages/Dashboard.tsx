@@ -2,13 +2,13 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCredentials } from "@/hooks/useCredentials";
-import type { Credential, CredentialInsert, CredentialUpdate } from "@/hooks/useCredentials";
+import type { CredentialInsert } from "@/hooks/useCredentials";
+import type { Tables } from "@/integrations/supabase/types";
 import CredentialForm from "@/components/CredentialForm";
 import CredentialCard from "@/components/CredentialCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Shield, Plus, Search, LogOut, Download, Mail, Users, Code, Wallet, Star, AlertTriangle, Key } from "lucide-react";
 import { CATEGORIES, DEVICES } from "@/lib/password";
@@ -16,15 +16,11 @@ import { differenceInDays } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+
+type Credential = Tables<"credentials">;
 
 const CATEGORY_ICON: Record<string, React.ReactNode> = {
   "E-mails": <Mail className="h-4 w-4" />,
@@ -45,44 +41,25 @@ export default function Dashboard() {
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [filterDevice, setFilterDevice] = useState("all");
-  const [filterService, setFilterService] = useState("all");
-  const [filterEnvironment, setFilterEnvironment] = useState("all");
   const [filterFavorite, setFilterFavorite] = useState(false);
-
-  // Get unique services for filter dropdown
-  const services = useMemo(() => {
-    const uniqueServices = new Set<string>();
-    credentials.forEach((c) => {
-      if (c.service) uniqueServices.add(c.service);
-    });
-    return Array.from(uniqueServices).sort();
-  }, [credentials]);
 
   const filtered = useMemo(() => {
     return credentials
       .filter((c) => {
         if (search) {
           const q = search.toLowerCase();
-          if (!c.nick.toLowerCase().includes(q) && !c.email?.toLowerCase().includes(q) && !c.description?.toLowerCase().includes(q) && !c.service?.toLowerCase().includes(q)) return false;
+          if (!c.nick.toLowerCase().includes(q) && !c.email?.toLowerCase().includes(q) && !c.description?.toLowerCase().includes(q)) return false;
         }
         if (filterCategory !== "all" && c.category !== filterCategory) return false;
         if (filterDevice !== "all" && !c.devices.includes(filterDevice)) return false;
-        if (filterService !== "all" && c.service !== filterService) return false;
-        if (filterEnvironment !== "all" && c.environment !== filterEnvironment) return false;
         if (filterFavorite && !c.is_favorite) return false;
         return true;
       })
-      // Sort: favorites first, then by last_used desc, then by created_at desc
       .sort((a, b) => {
-        if (a.is_favorite !== b.is_favorite) {
-          return a.is_favorite ? -1 : 1;
-        }
-        const aTime = a.last_used ? new Date(a.last_used).getTime() : 0;
-        const bTime = b.last_used ? new Date(b.last_used).getTime() : 0;
-        if (aTime !== bTime) return bTime - aTime;
+        if (a.is_favorite !== b.is_favorite) return a.is_favorite ? -1 : 1;
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       });
-  }, [credentials, search, filterCategory, filterDevice, filterService, filterEnvironment, filterFavorite]);
+  }, [credentials, search, filterCategory, filterDevice, filterFavorite]);
 
   const stats = useMemo(() => {
     const total = credentials.length;
@@ -116,7 +93,7 @@ export default function Dashboard() {
 
   const handleFormSubmit = async (data: CredentialInsert) => {
     if (editing) {
-      await updateCredential({ id: editing.id, ...data } as CredentialUpdate & { id: string });
+      await updateCredential({ id: editing.id, ...data });
     } else {
       await addCredential(data);
     }
@@ -124,7 +101,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
@@ -139,12 +115,9 @@ export default function Dashboard() {
             </Button>
             <span className="hidden text-sm text-muted-foreground sm:inline">{user?.email}</span>
             <Button variant="ghost" size="icon" onClick={() => navigate("/secrets")} title="Secrets Vault">
-                  <Key className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon" onClick={async () => {
-                  await signOut();
-                  navigate("/"); 
-                }} title="Sair">
+              <Key className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={async () => { await signOut(); navigate("/"); }} title="Sair">
               <LogOut className="h-4 w-4" />
             </Button>
           </div>
@@ -180,31 +153,8 @@ export default function Dashboard() {
         <div className="mb-6 flex flex-wrap items-center gap-3">
           <div className="relative flex-1 min-w-[200px]">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar por nick, e-mail, serviço, descrição..."
-              className="pl-9"
-            />
+            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar por nick, e-mail, descrição..." className="pl-9" />
           </div>
-          <Select value={filterService} onValueChange={setFilterService}>
-            <SelectTrigger className="w-[150px]"><SelectValue placeholder="Serviço" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos os serviços</SelectItem>
-              {services.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <Select value={filterEnvironment} onValueChange={setFilterEnvironment}>
-            <SelectTrigger className="w-[130px]"><SelectValue placeholder="Ambiente" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              <SelectItem value="development">Desenvolvimento</SelectItem>
-              <SelectItem value="staging">Staging</SelectItem>
-              <SelectItem value="production">Produção</SelectItem>
-              <SelectItem value="personal">Pessoal</SelectItem>
-              <SelectItem value="work">Trabalho</SelectItem>
-            </SelectContent>
-          </Select>
           <Select value={filterCategory} onValueChange={setFilterCategory}>
             <SelectTrigger className="w-[160px]"><SelectValue placeholder="Categoria" /></SelectTrigger>
             <SelectContent>
@@ -219,11 +169,7 @@ export default function Dashboard() {
               {DEVICES.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
             </SelectContent>
           </Select>
-          <Button
-            variant={filterFavorite ? "default" : "outline"}
-            size="sm"
-            onClick={() => setFilterFavorite(!filterFavorite)}
-          >
+          <Button variant={filterFavorite ? "default" : "outline"} size="sm" onClick={() => setFilterFavorite(!filterFavorite)}>
             <Star className={`h-4 w-4 ${filterFavorite ? "fill-current" : ""}`} />
           </Button>
           <Button onClick={() => { setEditing(null); setFormOpen(true); }}>
@@ -255,14 +201,7 @@ export default function Dashboard() {
           <motion.div layout className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <AnimatePresence>
               {filtered.map((c) => (
-                <motion.div
-                  key={c.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
-                >
+                <motion.div key={c.id} layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.2 }}>
                   <CredentialCard
                     credential={c}
                     onEdit={(c) => { setEditing(c); setFormOpen(true); }}
@@ -276,29 +215,17 @@ export default function Dashboard() {
         )}
       </main>
 
-      {/* Form dialog */}
-      <CredentialForm
-        open={formOpen}
-        onClose={() => { setFormOpen(false); setEditing(null); }}
-        onSubmit={handleFormSubmit}
-        initial={editing}
-      />
+      <CredentialForm open={formOpen} onClose={() => { setFormOpen(false); setEditing(null); }} onSubmit={handleFormSubmit} initial={editing} />
 
-      {/* Delete confirmation */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Essa ação não pode ser desfeita. A credencial será removida permanentemente.
-            </AlertDialogDescription>
+            <AlertDialogDescription>Essa ação não pode ser desfeita. A credencial será removida permanentemente.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={() => { if (deleteId) deleteCredential(deleteId); setDeleteId(null); }}
-            >
+            <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => { if (deleteId) deleteCredential(deleteId); setDeleteId(null); }}>
               Excluir
             </AlertDialogAction>
           </AlertDialogFooter>

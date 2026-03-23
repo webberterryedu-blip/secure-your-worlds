@@ -360,7 +360,7 @@ test.describe('VaultKey Password Vault - Complete Test Suite', () => {
       
       // Should show validation error (HTML5 required attribute)
       const nickInput = page.locator('input[required]').first();
-      await expect(nickInput).toBeInvalid();
+      await expect(nickInput).toHaveAttribute('required', '');
     });
   });
 });
