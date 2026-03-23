@@ -21,22 +21,12 @@ export type Database = {
           description: string | null
           devices: string[]
           email: string | null
-          encrypted_password: string | null
-          environment: string | null
           expires_at: string | null
           id: string
           is_favorite: boolean
-          iv: string | null
-          kdf_algorithm: string | null
-          kdf_iterations: number | null
-          last_used: string | null
           nick: string
           notes: string | null
           password: string
-          projects: string[] | null
-          salt: string | null
-          service: string | null
-          service_url: string | null
           updated_at: string
           url: string | null
           user_id: string
@@ -47,22 +37,12 @@ export type Database = {
           description?: string | null
           devices?: string[]
           email?: string | null
-          encrypted_password?: string | null
-          environment?: string | null
           expires_at?: string | null
           id?: string
           is_favorite?: boolean
-          iv?: string | null
-          kdf_algorithm?: string | null
-          kdf_iterations?: number | null
-          last_used?: string | null
           nick: string
           notes?: string | null
           password: string
-          projects?: string[] | null
-          salt?: string | null
-          service?: string | null
-          service_url?: string | null
           updated_at?: string
           url?: string | null
           user_id: string
@@ -73,22 +53,12 @@ export type Database = {
           description?: string | null
           devices?: string[]
           email?: string | null
-          encrypted_password?: string | null
-          environment?: string | null
           expires_at?: string | null
           id?: string
           is_favorite?: boolean
-          iv?: string | null
-          kdf_algorithm?: string | null
-          kdf_iterations?: number | null
-          last_used?: string | null
           nick?: string
           notes?: string | null
           password?: string
-          projects?: string[] | null
-          salt?: string | null
-          service?: string | null
-          service_url?: string | null
           updated_at?: string
           url?: string | null
           user_id?: string
@@ -121,82 +91,82 @@ export type Database = {
       }
       secrets: {
         Row: {
-          id: string
-          user_id: string
-          service_name: string
-          token_name: string
+          created_at: string
+          description: string | null
           encrypted_value: string
+          expires_at: string | null
+          id: string
           iv: string
           salt: string
           secret_type: string
-          description: string | null
-          expires_at: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
           service_name: string
           token_name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
           encrypted_value: string
+          expires_at?: string | null
+          id?: string
           iv: string
           salt: string
           secret_type?: string
-          description?: string | null
-          expires_at?: string | null
-          created_at?: string
+          service_name: string
+          token_name: string
           updated_at?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          service_name?: string
-          token_name?: string
+          created_at?: string
+          description?: string | null
           encrypted_value?: string
+          expires_at?: string | null
+          id?: string
           iv?: string
           salt?: string
           secret_type?: string
-          description?: string | null
-          expires_at?: string | null
-          created_at?: string
+          service_name?: string
+          token_name?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
       user_secrets_config: {
         Row: {
-          id: string
-          user_id: string
-          secrets_password_hash: string
-          secrets_password_salt: string
-          totp_secret: string | null
-          totp_enabled: boolean
           auto_lock_minutes: number
           created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
+          id: string
           secrets_password_hash: string
           secrets_password_salt: string
-          totp_secret?: string | null
-          totp_enabled?: boolean
+          totp_enabled: boolean
+          totp_secret: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
           auto_lock_minutes?: number
           created_at?: string
+          id?: string
+          secrets_password_hash: string
+          secrets_password_salt: string
+          totp_enabled?: boolean
+          totp_secret?: string | null
           updated_at?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          secrets_password_hash?: string
-          secrets_password_salt?: string
-          totp_secret?: string | null
-          totp_enabled?: boolean
           auto_lock_minutes?: number
           created_at?: string
+          id?: string
+          secrets_password_hash?: string
+          secrets_password_salt?: string
+          totp_enabled?: boolean
+          totp_secret?: string | null
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
