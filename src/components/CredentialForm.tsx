@@ -6,23 +6,25 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Eye, EyeOff, Wand2, Copy, Plus, X } from "lucide-react";
+import { Eye, EyeOff, Wand2, Copy } from "lucide-react";
 import { generatePassword, getPasswordStrength, CATEGORIES, DEVICES } from "@/lib/password";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
-import type { Credential, CredentialInsert } from "@/hooks/useCredentials";
+import type { Tables } from "@/integrations/supabase/types";
+import type { CredentialInsert } from "@/hooks/useCredentials";
 
-const ENVIRONMENTS = ["development", "staging", "production", "personal", "work"] as const;
+type Credential = Tables<"credentials">;
 
 interface Props {
   open: boolean;
   onClose: () => void;
   onSubmit: (data: CredentialInsert) => Promise<void>;
   initial?: Credential | null;
+  defaultCategory?: string;
 }
 
-export default function CredentialForm({ open, onClose, onSubmit, initial }: Props) {
+export default function CredentialForm({ open, onClose, onSubmit, initial, defaultCategory }: Props) {
   const [nick, setNick] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,18 +34,9 @@ export default function CredentialForm({ open, onClose, onSubmit, initial }: Pro
   const [url, setUrl] = useState("");
   const [notes, setNotes] = useState("");
   const [expiresAt, setExpiresAt] = useState("");
-  
-  // New fields
-  const [service, setService] = useState("");
-  const [serviceUrl, setServiceUrl] = useState("");
-  const [environment, setEnvironment] = useState<string>("personal");
-  const [projects, setProjects] = useState<string[]>([]);
-  const [newProject, setNewProject] = useState("");
-  
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // Sync form with initial credential data when it changes
   useEffect(() => {
     if (initial) {
       setNick(initial.nick ?? "");
@@ -55,27 +48,18 @@ export default function CredentialForm({ open, onClose, onSubmit, initial }: Pro
       setUrl(initial.url ?? "");
       setNotes(initial.notes ?? "");
       setExpiresAt(initial.expires_at?.slice(0, 10) ?? "");
-      setService(initial.service ?? "");
-      setServiceUrl(initial.service_url ?? "");
-      setEnvironment(initial.environment ?? "personal");
-      setProjects(initial.projects ?? []);
     } else {
-      // Reset form when opening for new credential
       setNick("");
       setEmail("");
       setPassword("");
       setDescription("");
-      setCategory("E-mails");
+      setCategory(defaultCategory || "E-mails");
       setDevices([]);
       setUrl("");
       setNotes("");
       setExpiresAt("");
-      setService("");
-      setServiceUrl("");
-      setEnvironment("personal");
-      setProjects([]);
     }
-  }, [initial, open]);
+  }, [initial, open, defaultCategory]);
 
   const strength = getPasswordStrength(password);
 
@@ -87,17 +71,6 @@ export default function CredentialForm({ open, onClose, onSubmit, initial }: Pro
 
   const toggleDevice = (d: string) => {
     setDevices((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]));
-  };
-
-  const addProject = () => {
-    if (newProject.trim() && !projects.includes(newProject.trim())) {
-      setProjects([...projects, newProject.trim()]);
-      setNewProject("");
-    }
-  };
-
-  const removeProject = (project: string) => {
-    setProjects((prev) => prev.filter((p) => p !== project));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -114,11 +87,6 @@ export default function CredentialForm({ open, onClose, onSubmit, initial }: Pro
         url: url || null,
         notes: notes || null,
         expires_at: expiresAt ? new Date(expiresAt).toISOString() : null,
-        // New fields
-        service: service || null,
-        service_url: serviceUrl || null,
-        environment: environment || null,
-        projects: projects.length > 0 ? projects : null,
       });
       onClose();
     } catch {
@@ -136,71 +104,79 @@ export default function CredentialForm({ open, onClose, onSubmit, initial }: Pro
             {initial ? "Editar Credencial" : "Nova Credencial"}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label>Nick / Nome *</Label>
-              <Input value={nick} onChange={(e) => setNick(e.target.value)} placeholder="Gmail pessoal" required />
-            </div>
-            <div className="space-y-2">
-              <Label>E-mail da conta</Label>
-              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="user@email.com" />
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* ── IDENTIFICAÇÃO ── */}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Identificação</p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Nick / Nome *</Label>
+                <Input value={nick} onChange={(e) => setNick(e.target.value)} placeholder="Gmail pessoal" required />
+              </div>
+              <div className="space-y-2">
+                <Label>Categoria</Label>
+                <Select value={category} onValueChange={setCategory}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>E-mail da conta</Label>
+                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="user@email.com" />
+              </div>
+              <div className="space-y-2">
+                <Label>URL do serviço</Label>
+                <Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://..." />
+              </div>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label>Senha *</Label>
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  className="pr-20 font-mono"
-                />
-                <div className="absolute right-2 top-1/2 flex -translate-y-1/2 gap-1">
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-muted-foreground hover:text-foreground">
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                  <button type="button" onClick={() => { navigator.clipboard.writeText(password); toast.success("Copiado!"); }} className="text-muted-foreground hover:text-foreground">
-                    <Copy className="h-4 w-4" />
-                  </button>
+          <Separator />
+
+          {/* ── SEGURANÇA ── */}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Segurança</p>
+            <div className="space-y-2">
+              <Label>Senha *</Label>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    className="pr-20 font-mono"
+                  />
+                  <div className="absolute right-2 top-1/2 flex -translate-y-1/2 gap-1">
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-muted-foreground hover:text-foreground">
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                    <button type="button" onClick={() => { navigator.clipboard.writeText(password); toast.success("Copiado!"); }} className="text-muted-foreground hover:text-foreground">
+                      <Copy className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
+                <Button type="button" variant="outline" size="icon" onClick={handleGenerate} title="Gerar senha">
+                  <Wand2 className="h-4 w-4" />
+                </Button>
               </div>
-              <Button type="button" variant="outline" size="icon" onClick={handleGenerate} title="Gerar senha">
-                <Wand2 className="h-4 w-4" />
-              </Button>
-            </div>
-            {password && (
-              <div className="space-y-1">
-                <Progress value={strength.score} className="h-2" style={{ ["--progress-color" as any]: strength.color }} />
-                <p className="text-xs font-medium" style={{ color: strength.color }}>{strength.label}</p>
-              </div>
-            )}
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label>Categoria</Label>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {CATEGORIES.map((c) => (
-                    <SelectItem key={c} value={c}>{c}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>URL do serviço</Label>
-              <Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://..." />
+              {password && (
+                <div className="space-y-1">
+                  <Progress value={strength.score} className="h-2" />
+                  <p className="text-xs font-medium" style={{ color: strength.color }}>{strength.label}</p>
+                </div>
+              )}
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label>Dispositivos</Label>
+          <Separator />
+
+          {/* ── DISPOSITIVOS ── */}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Dispositivos</p>
             <div className="flex flex-wrap gap-3">
               {DEVICES.map((d) => (
                 <label key={d} className="flex items-center gap-2 text-sm">
@@ -211,68 +187,25 @@ export default function CredentialForm({ open, onClose, onSubmit, initial }: Pro
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label>Descrição</Label>
-            <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Conta principal do Google" />
-          </div>
+          <Separator />
 
-          <div className="space-y-2">
-            <Label>Data de expiração</Label>
-            <Input type="date" value={expiresAt} onChange={(e) => setExpiresAt(e.target.value)} />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Notas</Label>
-            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Pergunta de segurança, 2FA, etc." rows={3} />
-          </div>
-
-          {/* New: Environment Field */}
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label>Ambiente</Label>
-              <Select value={environment} onValueChange={setEnvironment}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {ENVIRONMENTS.map((env) => (
-                    <SelectItem key={env} value={env}>
-                      {env.charAt(0).toUpperCase() + env.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* New: Projects Field */}
-          <div className="space-y-2">
-            <Label>Projetos Associados</Label>
-            <div className="flex gap-2">
-              <Input 
-                value={newProject} 
-                onChange={(e) => setNewProject(e.target.value)} 
-                placeholder="Adicionar projeto..."
-                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addProject())}
-              />
-              <Button type="button" variant="outline" size="icon" onClick={addProject}>
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
-            {projects.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {projects.map((project) => (
-                  <Badge key={project} variant="secondary" className="gap-1">
-                    {project}
-                    <button 
-                      type="button" 
-                      onClick={() => removeProject(project)}
-                      className="ml-1 hover:text-destructive"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                ))}
+          {/* ── DETALHES ── */}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Detalhes</p>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Descrição</Label>
+                <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Conta principal do Google" />
               </div>
-            )}
+              <div className="space-y-2">
+                <Label>Data de expiração</Label>
+                <Input type="date" value={expiresAt} onChange={(e) => setExpiresAt(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label>Notas</Label>
+                <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Pergunta de segurança, 2FA, etc." rows={3} />
+              </div>
+            </div>
           </div>
 
           <div className="flex justify-end gap-2 pt-2">
