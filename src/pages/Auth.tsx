@@ -11,6 +11,8 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { evaluatePasswordStrength } from "@/lib/crypto";
+import { supabase } from "@/integrations/supabase/client";
+import { clearTwoFactorPassed } from "@/hooks/useTwoFactor";
 
 export default function Auth() {
   const { t } = useTranslation();
@@ -61,9 +63,23 @@ export default function Auth() {
     setSubmitting(true);
     try {
       if (isLogin) {
+        clearTwoFactorPassed();
         await signIn(email, password);
         toast.success("Login realizado com sucesso!");
-        navigate("/dashboard");
+        // Verifica se o usuário tem 2FA ativo antes de ir ao dashboard
+        const { data: { user: authedUser } } = await supabase.auth.getUser();
+        if (authedUser) {
+          const { data: cfg } = await supabase
+            .from("user_secrets_config")
+            .select("totp_enabled")
+            .eq("user_id", authedUser.id)
+            .maybeSingle();
+          if (cfg?.totp_enabled) {
+            navigate("/auth/2fa-verify", { replace: true });
+            return;
+          }
+        }
+        navigate("/dashboard", { replace: true });
       } else {
         await signUp(email, password, displayName);
         toast.success("Conta criada! Verifique seu e-mail para confirmar.");
