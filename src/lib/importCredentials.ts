@@ -92,8 +92,8 @@ export function parseJSON(text: string): ImportResult {
       return;
     }
     const r = buildRow(item, i);
-    if (!r.ok) result.errors.push({ row: i + 1, reason: r.reason });
-    else result.valid.push(r.cred);
+    if (r.ok) result.valid.push(r.cred);
+    else result.errors.push({ row: i + 1, reason: r.reason });
   });
   return result;
 }
