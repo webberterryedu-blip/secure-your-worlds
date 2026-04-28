@@ -1,33 +1,46 @@
 /**
- * 2FA Verification Page
- * Standalone page for 2FA verification
+ * 2FA Verification Page — exigida após login quando o usuário tem 2FA ativo.
  */
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { TwoFactorVerify } from "@/components/TwoFactorVerify";
-import { useVaultStore } from "@/stores/vaultStore";
 import { Shield } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useTwoFactor, markTwoFactorPassed } from "@/hooks/useTwoFactor";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 export default function TwoFactorVerifyPage() {
   const navigate = useNavigate();
-  const { setMasterPassword } = useVaultStore();
-  const [isVerifyOpen, setIsVerifyOpen] = useState(true);
+  const { user, signOut } = useAuth();
+  const { verify } = useTwoFactor();
+  const [code, setCode] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleVerified = () => {
-    // After verification, redirect to dashboard
-    navigate("/dashboard");
+  const handleVerify = async () => {
+    if (code.length !== 6 || !user) return;
+    setLoading(true);
+    try {
+      const ok = await verify(code);
+      if (ok) {
+        markTwoFactorPassed();
+        toast.success("Verificação concluída.");
+        navigate("/dashboard", { replace: true });
+      } else {
+        toast.error("Código inválido. Tente novamente.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro ao verificar código.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleClose = () => {
-    // If user closes without verifying, stay on the page
-    setIsVerifyOpen(true);
-  };
-
-  // If user needs to enter master password first
-  const handleMasterPasswordSubmit = (password: string) => {
-    setMasterPassword(password);
-    setIsVerifyOpen(true);
+  const handleCancel = async () => {
+    await signOut();
+    navigate("/auth", { replace: true });
   };
 
   return (
@@ -38,19 +51,30 @@ export default function TwoFactorVerifyPage() {
             <Shield className="h-8 w-8 text-primary" />
           </div>
         </div>
-        
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold">Two-Factor Authentication</h1>
+          <h1 className="text-2xl font-bold">Verificação em Duas Etapas</h1>
           <p className="text-muted-foreground">
-            Please verify your identity to continue
+            Digite o código de 6 dígitos do seu app autenticador.
           </p>
         </div>
-
-        <TwoFactorVerify
-          isOpen={isVerifyOpen}
-          onClose={handleClose}
-          onVerified={handleVerified}
-        />
+        <div className="space-y-3">
+          <Input
+            placeholder="000000"
+            value={code}
+            onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+            onKeyDown={(e) => e.key === "Enter" && handleVerify()}
+            maxLength={6}
+            inputMode="numeric"
+            autoFocus
+            className="text-center font-mono text-2xl tracking-widest"
+          />
+          <Button onClick={handleVerify} disabled={loading || code.length !== 6} className="w-full">
+            {loading ? "Verificando..." : "Verificar"}
+          </Button>
+          <Button variant="ghost" onClick={handleCancel} className="w-full">
+            Cancelar e sair
+          </Button>
+        </div>
       </div>
     </div>
   );
