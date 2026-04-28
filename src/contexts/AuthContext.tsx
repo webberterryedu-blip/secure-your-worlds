@@ -55,6 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
+    sessionStorage.removeItem("vk_2fa_passed");
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
   };
