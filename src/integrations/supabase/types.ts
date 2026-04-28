@@ -139,8 +139,8 @@ export type Database = {
           auto_lock_minutes: number
           created_at: string
           id: string
-          secrets_password_hash: string
-          secrets_password_salt: string
+          secrets_password_hash: string | null
+          secrets_password_salt: string | null
           totp_enabled: boolean
           totp_secret: string | null
           updated_at: string
@@ -150,8 +150,8 @@ export type Database = {
           auto_lock_minutes?: number
           created_at?: string
           id?: string
-          secrets_password_hash: string
-          secrets_password_salt: string
+          secrets_password_hash?: string | null
+          secrets_password_salt?: string | null
           totp_enabled?: boolean
           totp_secret?: string | null
           updated_at?: string
@@ -161,8 +161,8 @@ export type Database = {
           auto_lock_minutes?: number
           created_at?: string
           id?: string
-          secrets_password_hash?: string
-          secrets_password_salt?: string
+          secrets_password_hash?: string | null
+          secrets_password_salt?: string | null
           totp_enabled?: boolean
           totp_secret?: string | null
           updated_at?: string
