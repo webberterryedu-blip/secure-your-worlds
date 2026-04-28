@@ -139,8 +139,8 @@ export function parseCSV(text: string): ImportResult {
     const obj: Record<string, string> = {};
     headers.forEach((h, idx) => { obj[h] = row[idx] ?? ""; });
     const r = buildRow(obj, i);
-    if (!r.ok) result.errors.push({ row: i + 1, reason: r.reason });
-    else result.valid.push(r.cred);
+    if (r.ok === true) result.valid.push(r.cred);
+    else result.errors.push({ row: i + 1, reason: r.reason });
   }
   return result;
 }
