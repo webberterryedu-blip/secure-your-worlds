@@ -93,7 +93,7 @@ export function parseJSON(text: string): ImportResult {
     }
     const r = buildRow(item, i);
     if (r.ok) result.valid.push(r.cred);
-    else result.errors.push({ row: i + 1, reason: r.reason });
+    else if (!r.ok) result.errors.push({ row: i + 1, reason: r.reason });
   });
   return result;
 }
@@ -140,7 +140,7 @@ export function parseCSV(text: string): ImportResult {
     headers.forEach((h, idx) => { obj[h] = row[idx] ?? ""; });
     const r = buildRow(obj, i);
     if (r.ok) result.valid.push(r.cred);
-    else result.errors.push({ row: i + 1, reason: r.reason });
+    else if (!r.ok) result.errors.push({ row: i + 1, reason: r.reason });
   }
   return result;
 }
