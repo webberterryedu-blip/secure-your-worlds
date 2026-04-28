@@ -6,11 +6,12 @@ import type { CredentialInsert } from "@/hooks/useCredentials";
 import type { Tables } from "@/integrations/supabase/types";
 import CredentialForm from "@/components/CredentialForm";
 import CredentialCard from "@/components/CredentialCard";
+import ImportDialog from "@/components/ImportDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Shield, Plus, Search, LogOut, Download, Mail, Users, Code, Wallet, Star, AlertTriangle, Key } from "lucide-react";
+import { Shield, Plus, Search, LogOut, Download, Upload, Mail, Users, Code, Wallet, Star, AlertTriangle, Key } from "lucide-react";
 import { CATEGORIES, DEVICES } from "@/lib/password";
 import { differenceInDays } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
@@ -35,6 +36,7 @@ export default function Dashboard() {
   const { credentials, isLoading, addCredential, updateCredential, deleteCredential, toggleFavorite } = useCredentials();
 
   const [formOpen, setFormOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [editing, setEditing] = useState<Credential | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
@@ -110,6 +112,9 @@ export default function Dashboard() {
             <h1 className="text-xl font-bold font-mono tracking-tight">VaultKey</h1>
           </div>
           <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={() => setImportOpen(true)} title="Importar CSV/JSON">
+              <Upload className="h-4 w-4" />
+            </Button>
             <Button variant="ghost" size="sm" onClick={handleExport} title="Exportar JSON">
               <Download className="h-4 w-4" />
             </Button>
@@ -216,6 +221,8 @@ export default function Dashboard() {
       </main>
 
       <CredentialForm open={formOpen} onClose={() => { setFormOpen(false); setEditing(null); }} onSubmit={handleFormSubmit} initial={editing} />
+
+      <ImportDialog open={importOpen} onClose={() => setImportOpen(false)} onImport={addCredential} />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
