@@ -1,15 +1,14 @@
 /**
- * Two-Factor Authentication Verification Component
- * Dialog for verifying 2FA token during login
+ * Two-Factor Authentication Verification Dialog (componente reusável).
+ * Verifica direto contra o Supabase via useTwoFactor.
  */
 
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { verify2FAToken } from "@/lib/2fa";
-import { useVaultStore } from "@/stores/vaultStore";
+import { markTwoFactorPassed, useTwoFactor } from "@/hooks/useTwoFactor";
 
 interface TwoFactorVerifyProps {
   isOpen: boolean;
@@ -18,50 +17,28 @@ interface TwoFactorVerifyProps {
 }
 
 export function TwoFactorVerify({ isOpen, onClose, onVerified }: TwoFactorVerifyProps) {
-  const { masterPassword, decrypt2FASecret, set2FAVerified } = useVaultStore();
+  const { verify } = useTwoFactor();
   const [token, setToken] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleVerify = async () => {
-    if (!token) {
-      toast.error("Please enter the 6-digit code.");
-      return;
-    }
-    if (!masterPassword) {
-      toast.error("Master password not set. Cannot verify 2FA.");
-      onClose();
-      return;
-    }
-
+    if (token.length !== 6) return;
     setLoading(true);
     try {
-      const secret = await decrypt2FASecret();
-      if (!secret) {
-        toast.error("2FA secret not found or decryption error.");
-        onClose();
-        return;
-      }
-
-      const isValid = verify2FAToken(token, secret);
-      if (isValid) {
-        set2FAVerified(true);
-        toast.success("2FA verification successful!");
+      const ok = await verify(token);
+      if (ok) {
+        markTwoFactorPassed();
+        toast.success("2FA verificado com sucesso!");
         onVerified();
         onClose();
       } else {
-        toast.error("Invalid 2FA code. Please try again.");
+        toast.error("Código inválido. Tente novamente.");
       }
-    } catch (error) {
-      console.error("Error verifying 2FA:", error);
-      toast.error("Error verifying 2FA.");
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro ao verificar 2FA.");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && token.length === 6) {
-      handleVerify();
     }
   };
 
@@ -69,28 +46,22 @@ export function TwoFactorVerify({ isOpen, onClose, onVerified }: TwoFactorVerify
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Two-Factor Authentication (2FA)</DialogTitle>
-          <DialogDescription>
-            Please enter the 6-digit code from your authenticator app.
-          </DialogDescription>
+          <DialogTitle>Autenticação de Dois Fatores</DialogTitle>
+          <DialogDescription>Digite o código de 6 dígitos do seu app autenticador.</DialogDescription>
         </DialogHeader>
-
         <div className="space-y-4">
           <Input
-            placeholder="6-digit code"
+            placeholder="000000"
             value={token}
-            onChange={(e) => setToken(e.target.value.replace(/\D/g, '').slice(0, 6))}
-            onKeyPress={handleKeyPress}
+            onChange={(e) => setToken(e.target.value.replace(/\D/g, "").slice(0, 6))}
+            onKeyDown={(e) => e.key === "Enter" && token.length === 6 && handleVerify()}
             maxLength={6}
-            className="text-center text-lg tracking-widest font-mono"
+            inputMode="numeric"
             autoFocus
+            className="text-center font-mono text-lg tracking-widest"
           />
-          <Button 
-            onClick={handleVerify} 
-            disabled={loading || token.length !== 6} 
-            className="w-full"
-          >
-            {loading ? "Verifying..." : "Verify"}
+          <Button onClick={handleVerify} disabled={loading || token.length !== 6} className="w-full">
+            {loading ? "Verificando..." : "Verificar"}
           </Button>
         </div>
       </DialogContent>
