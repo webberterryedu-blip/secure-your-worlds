@@ -1,47 +1,96 @@
 /**
  * Reset Password Page
- * Allows users to set a new password using the reset token from email
+ * Allows users to set a new password using the reset token from email.
+ * Supports both hash-based (#access_token=...&type=recovery) and PKCE (?code=...) flows.
  */
 
 import React, { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
-import { Shield, AlertTriangle, AlertCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Shield, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { toast } from "sonner";
 
 export default function ResetPassword() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [checking, setChecking] = useState(true);
   const { updateUserPassword } = useAuth();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const accessToken = searchParams.get("access_token");
 
   useEffect(() => {
-    if (!accessToken) {
-      navigate("/auth");
-    }
-  }, [accessToken, navigate]);
+    const establishSession = async () => {
+      try {
+        // Flow 1: Hash-based (#access_token=...&refresh_token=...&type=recovery)
+        const hash = window.location.hash.startsWith("#")
+          ? window.location.hash.slice(1)
+          : window.location.hash;
+        const hashParams = new URLSearchParams(hash);
+        const accessToken = hashParams.get("access_token");
+        const refreshToken = hashParams.get("refresh_token");
+        const type = hashParams.get("type");
+
+        if (accessToken && refreshToken && type === "recovery") {
+          const { error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+          if (error) throw error;
+          window.history.replaceState(null, "", window.location.pathname);
+          setReady(true);
+          return;
+        }
+
+        // Flow 2: PKCE (?code=...)
+        const search = new URLSearchParams(window.location.search);
+        const code = search.get("code");
+        if (code) {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) throw error;
+          window.history.replaceState(null, "", window.location.pathname);
+          setReady(true);
+          return;
+        }
+
+        // Flow 3: Session already exists (e.g. user clicked link, supabase-js auto-handled it)
+        const { data } = await supabase.auth.getSession();
+        if (data.session) {
+          setReady(true);
+          return;
+        }
+
+        toast.error("Link de redefinição inválido ou expirado.");
+        navigate("/auth/forgot-password", { replace: true });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "Erro ao validar link de recuperação";
+        toast.error(msg);
+        navigate("/auth/forgot-password", { replace: true });
+      } finally {
+        setChecking(false);
+      }
+    };
+
+    establishSession();
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      return;
-    }
-    if (password.length < 6) {
-      return;
-    }
+    if (password !== confirmPassword) return;
+    if (password.length < 6) return;
 
     setLoading(true);
     try {
       await updateUserPassword(password);
+      await supabase.auth.signOut();
       navigate("/auth");
     } catch (error) {
-      // Error already handled in AuthContext with toast
+      // toast handled in AuthContext
     } finally {
       setLoading(false);
     }
@@ -50,9 +99,15 @@ export default function ResetPassword() {
   const passwordsMatch = password === confirmPassword;
   const isValid = password.length >= 6 && passwordsMatch;
 
-  if (!accessToken) {
-    return null;
+  if (checking) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Shield className="h-8 w-8 animate-pulse text-primary" />
+      </div>
+    );
   }
+
+  if (!ready) return null;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
@@ -61,24 +116,24 @@ export default function ResetPassword() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
             <Shield className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl font-bold text-foreground">Reset Password</CardTitle>
+          <CardTitle className="text-2xl font-bold text-foreground">Redefinir Senha</CardTitle>
           <CardDescription className="text-muted-foreground">
-            Set your new password to access VaultKey.
+            Defina sua nova senha para acessar o VaultKey.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Alert variant="destructive" className="mb-4">
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Attention: Master Password!</AlertTitle>
+            <AlertTitle>Atenção: Master Password!</AlertTitle>
             <AlertDescription>
-              Resetting your login password <strong>does NOT</strong> reset your Master Password. You will still need the original Master Password to decrypt your credentials.
+              Redefinir sua senha de login <strong>NÃO</strong> redefine sua Master Password. Você ainda precisará da Master Password original para descriptografar suas credenciais.
             </AlertDescription>
           </Alert>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Input
                 type="password"
-                placeholder="New Password"
+                placeholder="Nova Senha"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -88,18 +143,18 @@ export default function ResetPassword() {
             <div className="space-y-2">
               <Input
                 type="password"
-                placeholder="Confirm New Password"
+                placeholder="Confirmar Nova Senha"
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="bg-input border-border text-foreground"
               />
               {confirmPassword && !passwordsMatch && (
-                <p className="text-xs text-red-500">Passwords do not match</p>
+                <p className="text-xs text-red-500">As senhas não coincidem</p>
               )}
             </div>
             <Button type="submit" className="w-full" disabled={loading || !isValid}>
-              {loading ? "Resetting..." : "Reset Password"}
+              {loading ? "Redefinindo..." : "Redefinir Senha"}
             </Button>
           </form>
         </CardContent>
