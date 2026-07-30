@@ -189,7 +189,8 @@ const resources = {
       // Navigation
       "nav.all": "All",
       "nav.identities": "Identities",
-      "nav.categories": "Categories"
+      "nav.categories": "Categories",
+      "nav.settings": "Security"
     }
   },
   pt: {
@@ -378,7 +379,8 @@ const resources = {
       // Navigation
       "nav.all": "Todas",
       "nav.identities": "Identidades",
-      "nav.categories": "Categorias"
+      "nav.categories": "Categorias",
+      "nav.settings": "Segurança"
     }
   }
 };
