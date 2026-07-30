@@ -36,11 +36,14 @@ export function generate2FAQRCodeUrl(secret: string, accountName: string, issuer
  */
 export function verify2FAToken(token: string, secret: string): boolean {
   try {
-    const result = verifySync({ token, secret });
-    // Result is either VerifyResultValid (truthy) or VerifyResultInvalid (falsy)
-    return !!result;
+    const clean = (token || '').replace(/\D/g, '');
+    if (clean.length !== 6 || !secret) return false;
+    const result = verifySync({ token: clean, secret });
+    // otplib v13 retorna um objeto: { valid: boolean, ... } — objeto é sempre truthy.
+    return result?.valid === true;
   } catch (error) {
     console.error('2FA verification error:', error);
     return false;
   }
 }
+

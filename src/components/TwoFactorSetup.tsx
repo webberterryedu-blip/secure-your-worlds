@@ -62,7 +62,8 @@ export function TwoFactorSetup({ isOpen, onClose, onSetupComplete }: TwoFactorSe
       }
     } catch (err) {
       console.error("2FA enable error:", err);
-      toast.error("Erro ao ativar 2FA.");
+      const msg = err instanceof Error ? err.message : String(err);
+      toast.error(`Erro ao ativar 2FA: ${msg}`);
     } finally {
       setLoading(false);
     }
