@@ -174,9 +174,10 @@ export default function Dashboard() {
               {DEVICES.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
             </SelectContent>
           </Select>
-          <Button variant={filterFavorite ? "default" : "outline"} size="sm" onClick={() => setFilterFavorite(!filterFavorite)}>
+          <Button variant={filterFavorite ? "default" : "outline"} size="sm" onClick={() => setFilterFavorite(!filterFavorite)} aria-pressed={filterFavorite} aria-label="Filtrar favoritos" title="Filtrar favoritos">
             <Star className={`h-4 w-4 ${filterFavorite ? "fill-current" : ""}`} />
           </Button>
+
           <Button onClick={() => { setEditing(null); setFormOpen(true); }}>
             <Plus className="h-4 w-4" /> Nova
           </Button>
