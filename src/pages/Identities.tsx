@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Seo from "@/components/Seo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -69,6 +70,7 @@ export default function Identities() {
 
   return (
     <div className="space-y-6">
+      <Seo title="Identidades — VaultKey" description="Organize suas credenciais por identidade e mantenha contas pessoais e profissionais separadas no VaultKey." path="/identities" noindex />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">{t('identities.title')}</h1>
