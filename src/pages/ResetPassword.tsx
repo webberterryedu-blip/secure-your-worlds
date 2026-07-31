@@ -8,6 +8,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Seo from "@/components/Seo";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -122,7 +123,7 @@ export default function ResetPassword() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
             <Shield className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle asChild className="text-2xl font-bold text-foreground"><h1>Redefinir senha da conta VaultKey</h1></CardTitle>
+          <h1 className="text-2xl font-semibold leading-none tracking-tight font-bold text-foreground">Redefinir senha da conta VaultKey</h1>
           <CardDescription className="text-muted-foreground">
             Defina sua nova senha para acessar o VaultKey.
           </CardDescription>
@@ -165,6 +166,6 @@ export default function ResetPassword() {
           </form>
         </CardContent>
       </Card>
-    </div>
+    </main>
   );
 }

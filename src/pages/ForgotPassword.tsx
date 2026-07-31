@@ -43,7 +43,7 @@ export default function ForgotPassword() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
             <Shield className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle asChild className="text-2xl font-bold text-foreground"><h1>Recuperar senha da conta VaultKey</h1></CardTitle>
+          <h1 className="text-2xl font-semibold leading-none tracking-tight font-bold text-foreground">Recuperar senha da conta VaultKey</h1>
           <CardDescription className="text-muted-foreground">
             Enter your email to receive a recovery link.
           </CardDescription>
@@ -72,6 +72,6 @@ export default function ForgotPassword() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </main>
   );
 }
