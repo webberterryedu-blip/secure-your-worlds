@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import Seo from "@/components/Seo";
 import { Shield, Plus, Search, LogOut, Download, Upload, Mail, Users, Code, Wallet, Star, AlertTriangle, Key } from "lucide-react";
 import { CATEGORIES, DEVICES } from "@/lib/password";
 import { differenceInDays } from "date-fns";
@@ -103,6 +104,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Seo title="Meu cofre — VaultKey" description="Gerencie suas credenciais criptografadas no VaultKey." path="/dashboard" noindex />
       <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
