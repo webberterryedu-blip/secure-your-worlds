@@ -109,20 +109,20 @@ export default function Dashboard() {
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
               <Shield className="h-5 w-5 text-primary" />
             </div>
-            <h1 className="text-xl font-bold font-mono tracking-tight">VaultKey</h1>
+            <h1 className="text-xl font-bold font-mono tracking-tight">VaultKey <span className="sr-only">— Cofre de Senhas Seguro</span></h1>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => setImportOpen(true)} title="Importar CSV/JSON">
+            <Button variant="ghost" size="sm" onClick={() => setImportOpen(true)} title="Importar CSV/JSON" aria-label="Importar CSV/JSON">
               <Upload className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="sm" onClick={handleExport} title="Exportar JSON">
+            <Button variant="ghost" size="sm" onClick={handleExport} title="Exportar JSON" aria-label="Exportar JSON">
               <Download className="h-4 w-4" />
             </Button>
             <span className="hidden text-sm text-muted-foreground sm:inline">{user?.email}</span>
-            <Button variant="ghost" size="icon" onClick={() => navigate("/secrets")} title="Secrets Vault">
+            <Button variant="ghost" size="icon" onClick={() => navigate("/secrets")} title="Secrets Vault" aria-label="Secrets Vault">
               <Key className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={async () => { await signOut(); navigate("/"); }} title="Sair">
+            <Button variant="ghost" size="icon" onClick={async () => { await signOut(); navigate("/"); }} title="Sair" aria-label="Sair">
               <LogOut className="h-4 w-4" />
             </Button>
           </div>

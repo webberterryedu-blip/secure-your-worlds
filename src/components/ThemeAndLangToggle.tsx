@@ -35,6 +35,7 @@ export function ThemeAndLangToggle() {
         size="icon" 
         onClick={toggleLanguage}
         title={i18n.language === 'pt' ? 'Switch to English' : 'Mudar para Português'}
+        aria-label={i18n.language === 'pt' ? 'Switch to English' : 'Mudar para Português'}
       >
         <Languages className="h-4 w-4" />
         <span className="sr-only">
@@ -48,6 +49,7 @@ export function ThemeAndLangToggle() {
         size="icon" 
         onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
         title={theme === "dark" ? "Switch to light mode" : "Alternar para modo escuro"}
+        aria-label={theme === "dark" ? "Switch to light mode" : "Alternar para modo escuro"}
       >
         <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
         <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
