@@ -4,6 +4,7 @@ import { Shield, Lock, Eye, Key, Smartphone, Cloud, Clock, Star, ArrowRight, Che
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ThemeAndLangToggle } from "@/components/ThemeAndLangToggle";
+import Seo from "@/components/Seo";
 
 const FEATURES = [
   {
@@ -46,6 +47,19 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Seo
+        title="VaultKey — Cofre de senhas com criptografia no navegador"
+        description="Guarde senhas, chaves de API e credenciais em um cofre zero-knowledge com criptografia AES-256-GCM feita 100% no seu navegador."
+        path="/"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "VaultKey",
+          url: "https://secure-your-worlds.lovable.app/",
+          description:
+            "Cofre digital zero-knowledge para senhas, chaves de API e credenciais.",
+        }}
+      />
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
@@ -53,7 +67,7 @@ export default function Landing() {
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
               <Shield className="h-5 w-5 text-primary" />
             </div>
-            <h1 className="text-xl font-bold font-mono tracking-tight">VaultKey</h1>
+            <span className="text-xl font-bold font-mono tracking-tight">VaultKey</span>
           </div>
           <div className="flex items-center gap-3">
             <ThemeAndLangToggle />
@@ -67,6 +81,7 @@ export default function Landing() {
         </div>
       </header>
 
+      <main>
       {/* Hero Section */}
       <section className="relative overflow-hidden py-20 lg:py-32">
         {/* Background effects */}
@@ -229,6 +244,8 @@ export default function Landing() {
         </div>
       </section>
 
+      </main>
+
       {/* Footer */}
       <footer className="border-t border-border py-8">
         <div className="mx-auto max-w-7xl px-4">
@@ -245,12 +262,14 @@ export default function Landing() {
                 href="https://github.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
+                aria-label="GitHub"
                 className="text-muted-foreground hover:text-foreground"
               >
                 <Github className="h-5 w-5" />
               </a>
               <a 
                 href="#" 
+                aria-label="Website"
                 className="text-muted-foreground hover:text-foreground"
               >
                 <Globe className="h-5 w-5" />

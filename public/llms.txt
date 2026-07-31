@@ -1,0 +1,14 @@
+# VaultKey
+
+> VaultKey is a zero-knowledge password vault: store, organize and manage passwords, API keys and credentials with AES-256-GCM encryption performed entirely in your browser.
+
+VaultKey is built for developers and professionals who need strong client-side encryption, a password generator, strength indicators, expiration alerts and device-based organization.
+
+## Pages
+
+- [Home](/): Overview of VaultKey, features and security model.
+- [Sign in / Sign up](/auth): Create an account or access your vault.
+
+## Optional
+
+- [Forgot password](/auth/forgot-password): Recover access to your account.

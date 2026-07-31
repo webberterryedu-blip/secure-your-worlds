@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { Shield, ArrowLeft } from "lucide-react";
+import Seo from "@/components/Seo";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -31,13 +32,18 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+    <main className="flex min-h-screen items-center justify-center bg-background p-4">
+      <Seo
+        title="Recuperar senha da conta — VaultKey"
+        description="Informe seu e-mail para receber um link de recuperação e voltar a acessar sua conta VaultKey com segurança."
+        path="/auth/forgot-password"
+      />
       <Card className="w-full max-w-md bg-card border-border">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
             <Shield className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl font-bold text-foreground">Forgot Password?</CardTitle>
+          <h1 className="text-2xl font-semibold leading-none tracking-tight font-bold text-foreground">Recuperar senha da conta VaultKey</h1>
           <CardDescription className="text-muted-foreground">
             Enter your email to receive a recovery link.
           </CardDescription>
@@ -66,6 +72,6 @@ export default function ForgotPassword() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </main>
   );
 }

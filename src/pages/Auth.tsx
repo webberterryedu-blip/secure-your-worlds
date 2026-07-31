@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
+import Seo from "@/components/Seo";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -93,7 +94,12 @@ export default function Auth() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+    <main className="flex min-h-screen items-center justify-center bg-background p-4">
+      <Seo
+        title="Entrar ou criar conta — VaultKey"
+        description="Acesse seu cofre VaultKey ou crie uma conta gratuita para guardar senhas e chaves de API com criptografia no navegador."
+        path="/auth"
+      />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -115,7 +121,7 @@ export default function Auth() {
             <Shield className="h-8 w-8 text-primary" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground font-mono">
-            VaultKey
+            VaultKey <span className="sr-only">— Acesse seu cofre de senhas</span>
           </h1>
           <p className="mt-2 text-muted-foreground">
             {t('auth.vault_subtitle')}
@@ -277,6 +283,6 @@ export default function Auth() {
           </CardContent>
         </Card>
       </motion.div>
-    </div>
+    </main>
   );
 }

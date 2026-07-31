@@ -8,6 +8,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Seo from "@/components/Seo";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -110,13 +111,19 @@ export default function ResetPassword() {
   if (!ready) return null;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+    <main className="flex min-h-screen items-center justify-center bg-background p-4">
+      <Seo
+        title="Redefinir senha — VaultKey"
+        description="Defina uma nova senha para sua conta VaultKey e recupere o acesso ao seu cofre de credenciais."
+        path="/auth/reset-password"
+        noindex
+      />
       <Card className="w-full max-w-md bg-card border-border">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
             <Shield className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl font-bold text-foreground">Redefinir Senha</CardTitle>
+          <h1 className="text-2xl font-semibold leading-none tracking-tight font-bold text-foreground">Redefinir senha da conta VaultKey</h1>
           <CardDescription className="text-muted-foreground">
             Defina sua nova senha para acessar o VaultKey.
           </CardDescription>
@@ -159,6 +166,6 @@ export default function ResetPassword() {
           </form>
         </CardContent>
       </Card>
-    </div>
+    </main>
   );
 }

@@ -12,3 +12,8 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /dashboard
+Disallow: /secrets
+Disallow: /settings
+
+Sitemap: https://secure-your-worlds.lovable.app/sitemap.xml

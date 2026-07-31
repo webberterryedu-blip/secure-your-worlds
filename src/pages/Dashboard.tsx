@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import Seo from "@/components/Seo";
 import { Shield, Plus, Search, LogOut, Download, Upload, Mail, Users, Code, Wallet, Star, AlertTriangle, Key } from "lucide-react";
 import { CATEGORIES, DEVICES } from "@/lib/password";
 import { differenceInDays } from "date-fns";
@@ -103,26 +104,27 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Seo title="Meu cofre — VaultKey" description="Gerencie suas credenciais criptografadas no VaultKey." path="/dashboard" noindex />
       <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
               <Shield className="h-5 w-5 text-primary" />
             </div>
-            <h1 className="text-xl font-bold font-mono tracking-tight">VaultKey</h1>
+            <h1 className="text-xl font-bold font-mono tracking-tight">VaultKey <span className="sr-only">— Cofre de Senhas Seguro</span></h1>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => setImportOpen(true)} title="Importar CSV/JSON">
+            <Button variant="ghost" size="sm" onClick={() => setImportOpen(true)} title="Importar CSV/JSON" aria-label="Importar CSV/JSON">
               <Upload className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="sm" onClick={handleExport} title="Exportar JSON">
+            <Button variant="ghost" size="sm" onClick={handleExport} title="Exportar JSON" aria-label="Exportar JSON">
               <Download className="h-4 w-4" />
             </Button>
             <span className="hidden text-sm text-muted-foreground sm:inline">{user?.email}</span>
-            <Button variant="ghost" size="icon" onClick={() => navigate("/secrets")} title="Secrets Vault">
+            <Button variant="ghost" size="icon" onClick={() => navigate("/secrets")} title="Secrets Vault" aria-label="Secrets Vault">
               <Key className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={async () => { await signOut(); navigate("/"); }} title="Sair">
+            <Button variant="ghost" size="icon" onClick={async () => { await signOut(); navigate("/"); }} title="Sair" aria-label="Sair">
               <LogOut className="h-4 w-4" />
             </Button>
           </div>
@@ -174,9 +176,10 @@ export default function Dashboard() {
               {DEVICES.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
             </SelectContent>
           </Select>
-          <Button variant={filterFavorite ? "default" : "outline"} size="sm" onClick={() => setFilterFavorite(!filterFavorite)}>
+          <Button variant={filterFavorite ? "default" : "outline"} size="sm" onClick={() => setFilterFavorite(!filterFavorite)} aria-pressed={filterFavorite} aria-label="Filtrar favoritos" title="Filtrar favoritos">
             <Star className={`h-4 w-4 ${filterFavorite ? "fill-current" : ""}`} />
           </Button>
+
           <Button onClick={() => { setEditing(null); setFormOpen(true); }}>
             <Plus className="h-4 w-4" /> Nova
           </Button>
