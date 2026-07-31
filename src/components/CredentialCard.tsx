@@ -53,7 +53,7 @@ export default function CredentialCard({ credential, onEdit, onDelete, onToggleF
               </div>
             </div>
           </div>
-          <button onClick={() => onToggleFavorite({ id: c.id, is_favorite: c.is_favorite })} className="shrink-0">
+          <button type="button" aria-label={c.is_favorite ? "Remover dos favoritos" : "Marcar como favorito"} aria-pressed={c.is_favorite} title={c.is_favorite ? "Remover dos favoritos" : "Marcar como favorito"} onClick={() => onToggleFavorite({ id: c.id, is_favorite: c.is_favorite })} className="shrink-0">
             <Star className={`h-5 w-5 transition-colors ${c.is_favorite ? "fill-primary text-primary" : "text-muted-foreground/40 hover:text-primary"}`} />
           </button>
         </div>
@@ -79,10 +79,10 @@ export default function CredentialCard({ credential, onEdit, onDelete, onToggleF
           <div className="flex-1 rounded-md bg-muted px-3 py-1.5 font-mono text-sm truncate">
             {showPassword ? c.password : "••••••••••••"}
           </div>
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => setShowPassword(!showPassword)}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"} title={showPassword ? "Ocultar senha" : "Mostrar senha"} onClick={() => setShowPassword(!showPassword)}>
             {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => copyText(c.password, "Senha")}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Copiar senha" title="Copiar senha" onClick={() => copyText(c.password, "Senha")}>
             <Copy className="h-3.5 w-3.5" />
           </Button>
         </div>
@@ -97,14 +97,14 @@ export default function CredentialCard({ credential, onEdit, onDelete, onToggleF
           </div>
           <div className="flex gap-1">
             {c.email && (
-              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => copyText(c.email!, "E-mail")} title="Copiar e-mail">
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => copyText(c.email!, "E-mail")} title="Copiar e-mail" aria-label="Copiar e-mail">
                 <Mail className="h-3.5 w-3.5" />
               </Button>
             )}
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEdit(c)} title="Editar">
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEdit(c)} title="Editar" aria-label="Editar credencial">
               <Pencil className="h-3.5 w-3.5" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => onDelete(c.id)} title="Excluir">
+            <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => onDelete(c.id)} title="Excluir" aria-label="Excluir credencial">
               <Trash2 className="h-3.5 w-3.5" />
             </Button>
           </div>
