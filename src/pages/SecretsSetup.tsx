@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Shield, Key, Lock, CheckCircle, AlertCircle } from "lucide-react";
+import Seo from "@/components/Seo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -83,7 +84,8 @@ export default function SecretsSetup() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <main className="min-h-screen flex items-center justify-center bg-background p-4">
+      <Seo title="Configurar Secrets Vault — VaultKey" description="Defina a senha do seu Secrets Vault para guardar chaves de API e tokens com criptografia no navegador." path="/secrets/setup" noindex />
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
@@ -196,6 +198,6 @@ export default function SecretsSetup() {
           </form>
         </CardContent>
       </Card>
-    </div>
+    </main>
   );
 }

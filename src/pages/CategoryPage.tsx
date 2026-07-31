@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useCredentials } from "@/hooks/useCredentials";
 import type { Tables } from "@/integrations/supabase/types";
 import type { CredentialInsert } from "@/hooks/useCredentials";
 import CredentialForm from "@/components/CredentialForm";
 import CredentialCard from "@/components/CredentialCard";
+import Seo from "@/components/Seo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Search } from "lucide-react";
@@ -27,6 +29,7 @@ export default function CategoryPage({ category }: CategoryPageProps) {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Credential | null>(null);
   const [search, setSearch] = useState("");
+  const { pathname } = useLocation();
 
   const filtered = credentials
     .filter((c) => c.category === category)
@@ -48,6 +51,12 @@ export default function CategoryPage({ category }: CategoryPageProps) {
 
   return (
     <div className="space-y-6">
+      <Seo
+        title={`${label} — VaultKey`}
+        description={`Gerencie suas credenciais de ${label.toLowerCase()} no VaultKey, com criptografia AES-256-GCM feita no seu navegador.`}
+        path={pathname}
+        noindex
+      />
       <div>
         <h1 className="text-2xl font-bold">{label}</h1>
         <p className="text-muted-foreground">Gerencie suas credenciais de {label.toLowerCase()}</p>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Shield, Key, AlertCircle } from "lucide-react";
+import Seo from "@/components/Seo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -68,7 +69,8 @@ export default function SecretsUnlock({ onUnlock }: SecretsUnlockProps) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <main className="min-h-screen flex items-center justify-center bg-background p-4">
+      <Seo title="Desbloquear Secrets Vault — VaultKey" description="Informe a senha do Secrets Vault para descriptografar e acessar suas chaves de API e tokens." path="/secrets" noindex />
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
@@ -137,6 +139,6 @@ export default function SecretsUnlock({ onUnlock }: SecretsUnlockProps) {
           </form>
         </CardContent>
       </Card>
-    </div>
+    </main>
   );
 }

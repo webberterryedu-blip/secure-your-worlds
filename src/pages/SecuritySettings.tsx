@@ -4,6 +4,7 @@
 
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Seo from "@/components/Seo";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -55,8 +56,9 @@ export function SecuritySettings() {
 
   return (
     <div className="space-y-6">
+      <Seo title="Configurações de segurança — VaultKey" description="Ative a verificação em duas etapas (2FA) e gerencie as proteções da sua conta VaultKey." path="/settings/security" noindex />
       <div>
-        <h2 className="text-3xl font-bold text-foreground">Configurações de Segurança</h2>
+        <h1 className="text-3xl font-bold text-foreground">Configurações de Segurança</h1>
         <p className="text-muted-foreground">Gerencie a segurança da sua conta VaultKey.</p>
       </div>
 

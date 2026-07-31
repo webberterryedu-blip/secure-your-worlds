@@ -17,6 +17,7 @@ import {
   LogOut,
   RefreshCw,
 } from "lucide-react";
+import Seo from "@/components/Seo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -250,6 +251,7 @@ export default function SecretsDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Seo title="Secrets Vault — VaultKey" description="Guarde e gerencie chaves de API, tokens e segredos criptografados no Secrets Vault do VaultKey." path="/secrets" noindex />
       {/* Header */}
       <header className="border-b bg-card">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -271,6 +273,7 @@ export default function SecretsDashboard() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        <h1 className="mb-6 text-2xl font-bold">Secrets Vault — chaves de API e tokens</h1>
         {/* Actions Bar */}
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-1 items-center gap-2">
@@ -436,6 +439,8 @@ export default function SecretsDashboard() {
                       variant="ghost"
                       size="icon"
                       onClick={() => copyToClipboard(secret.id)}
+                      aria-label="Copiar segredo"
+                      title="Copiar segredo"
                     >
                       <Copy className="h-4 w-4" />
                     </Button>
@@ -443,6 +448,8 @@ export default function SecretsDashboard() {
                       variant="ghost"
                       size="icon"
                       onClick={() => toggleSecretVisibility(secret.id)}
+                      aria-label={visibleSecrets.has(secret.id) ? "Ocultar segredo" : "Mostrar segredo"}
+                      title={visibleSecrets.has(secret.id) ? "Ocultar segredo" : "Mostrar segredo"}
                     >
                       {visibleSecrets.has(secret.id) ? (
                         <EyeOff className="h-4 w-4" />
@@ -454,6 +461,8 @@ export default function SecretsDashboard() {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDeleteSecret(secret.id)}
+                      aria-label="Excluir segredo"
+                      title="Excluir segredo"
                       className="text-destructive hover:text-destructive"
                     >
                       <Trash2 className="h-4 w-4" />

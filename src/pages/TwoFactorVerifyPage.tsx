@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { Shield } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import Seo from "@/components/Seo";
 import { useTwoFactor, markTwoFactorPassed } from "@/hooks/useTwoFactor";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -44,7 +45,8 @@ export default function TwoFactorVerifyPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+    <main className="flex min-h-screen items-center justify-center bg-background p-4">
+      <Seo title="Verificação em duas etapas — VaultKey" description="Digite o código do seu aplicativo autenticador para concluir o login na sua conta VaultKey." path="/auth/2fa-verify" noindex />
       <div className="w-full max-w-md space-y-6 text-center">
         <div className="flex justify-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
@@ -76,6 +78,6 @@ export default function TwoFactorVerifyPage() {
           </Button>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
