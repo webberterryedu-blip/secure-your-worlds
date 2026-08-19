@@ -13,7 +13,7 @@ import { evaluatePasswordStrength, type PasswordStrength } from "@/lib/crypto";
 
 export default function SecretsSetup() {
   const navigate = useNavigate();
-  const { setupSecretsPassword, setupTOTP, isConfigured } = useSecrets();
+  const { setupSecretsPassword, isConfigured } = useSecrets();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [enableTOTP, setEnableTOTP] = useState(false);
@@ -70,8 +70,7 @@ export default function SecretsSetup() {
       await setupSecretsPassword(password);
 
       if (enableTOTP) {
-        await setupTOTP();
-        toast.success("TOTP enabled! You can now use it to access your secrets vault.");
+        toast.info("Ative a verificação em duas etapas em Configurações > Segurança para proteger o cofre.");
       }
 
       toast.success("Secrets vault configured successfully!");

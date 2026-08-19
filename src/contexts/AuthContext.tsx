@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
-    sessionStorage.removeItem("vk_2fa_passed");
+    // 2FA agora é validado no servidor por sessão; nada a limpar localmente.
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
   };

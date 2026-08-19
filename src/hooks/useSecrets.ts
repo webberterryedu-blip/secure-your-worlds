@@ -9,9 +9,6 @@ import {
   decryptSecret,
   hashSecretsPassword,
   verifySecretsPassword,
-  generateTOTPSecret,
-  generateTOTPCode,
-  verifyTOTP,
   type SecretType,
 } from "@/lib/secretsCrypto";
 
@@ -58,7 +55,7 @@ export function useSecrets() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("user_secrets_config")
-        .select("*")
+        .select("id, user_id, secrets_password_hash, secrets_password_salt, totp_enabled, auto_lock_minutes, created_at, updated_at")
         .eq("user_id", user!.id)
         .single();
       if (error) throw error;
@@ -196,10 +193,12 @@ export function useSecrets() {
       return false;
     }
 
-    // Verify TOTP if enabled
-    if (config.totp_enabled && config.totp_secret) {
-      const isTotpValid = await verifyTOTP(config.totp_secret, totpCode || "");
-      if (!isTotpValid) {
+    // Verify TOTP server-side if enabled (also unlocks RLS access for this session)
+    if (config.totp_enabled) {
+      const { data: res, error: fnError } = await supabase.functions.invoke("two-factor", {
+        body: { action: "verify", code: totpCode || "" },
+      });
+      if (fnError || !res?.ok) {
         toast.error("Invalid TOTP code");
         return false;
       }
@@ -235,50 +234,6 @@ export function useSecrets() {
     );
   };
 
-  // Setup TOTP
-  const setupTOTP = useMutation({
-    mutationFn: async () => {
-      const secret = generateTOTPSecret();
-
-      const { error } = await supabase
-        .from("user_secrets_config")
-        .update({
-          totp_secret: secret,
-          totp_enabled: true,
-        })
-        .eq("user_id", user!.id);
-
-      if (error) throw error;
-
-      return secret;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["userSecretsConfig"] });
-      toast.success("TOTP enabled! Save your secret key.");
-    },
-    onError: (err: any) => toast.error(err.message),
-  });
-
-  // Disable TOTP
-  const disableTOTP = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase
-        .from("user_secrets_config")
-        .update({
-          totp_secret: null,
-          totp_enabled: false,
-        })
-        .eq("user_id", user!.id);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["userSecretsConfig"] });
-      toast.success("TOTP disabled!");
-    },
-    onError: (err: any) => toast.error(err.message),
-  });
-
   return {
     // Data
     secrets: secretsQuery.data ?? [],
@@ -295,8 +250,6 @@ export function useSecrets() {
     unlock,
     lock,
     setupSecretsPassword: setupSecretsPassword.mutateAsync,
-    setupTOTP: setupTOTP.mutateAsync,
-    disableTOTP: disableTOTP.mutateAsync,
 
     // Mutations
     isAdding: addMutation.isPending,

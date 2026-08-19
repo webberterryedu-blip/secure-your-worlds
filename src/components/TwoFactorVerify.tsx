@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { markTwoFactorPassed, useTwoFactor } from "@/hooks/useTwoFactor";
+import { useTwoFactor } from "@/hooks/useTwoFactor";
 
 interface TwoFactorVerifyProps {
   isOpen: boolean;
@@ -27,7 +27,6 @@ export function TwoFactorVerify({ isOpen, onClose, onVerified }: TwoFactorVerify
     try {
       const ok = await verify(token);
       if (ok) {
-        markTwoFactorPassed();
         toast.success("2FA verificado com sucesso!");
         onVerified();
         onClose();
