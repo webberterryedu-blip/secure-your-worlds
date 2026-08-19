@@ -1,140 +1,89 @@
 /**
- * useTwoFactor — gerencia o ciclo de vida do 2FA TOTP da conta contra o Supabase.
- * Fonte da verdade: tabela user_secrets_config (campos totp_secret, totp_enabled).
+ * useTwoFactor — 2FA TOTP da conta, com autoridade no servidor.
+ * O segredo TOTP nunca é lido pelo navegador: toda verificação/ativação passa
+ * pela edge function `two-factor`, que registra a verificação na sessão.
+ * As políticas de RLS exigem essa verificação antes de liberar credenciais/secrets.
  */
 
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { verify2FAToken } from "@/lib/2fa";
 
 interface TwoFactorStatus {
   enabled: boolean;
+  /** true quando a sessão atual já passou pelo 2FA no servidor (ou 2FA está desativado). */
+  verified: boolean;
   loading: boolean;
+}
+
+type TwoFactorAction = "status" | "enable" | "disable" | "verify";
+
+async function callTwoFactor(action: TwoFactorAction, payload: Record<string, unknown> = {}) {
+  const { data, error } = await supabase.functions.invoke("two-factor", {
+    body: { action, ...payload },
+  });
+  if (error) throw error;
+  return (data ?? {}) as { ok?: boolean; enabled?: boolean; verified?: boolean };
 }
 
 export function useTwoFactor() {
   const { user } = useAuth();
-  const [status, setStatus] = useState<TwoFactorStatus>({ enabled: false, loading: true });
+  const [status, setStatus] = useState<TwoFactorStatus>({
+    enabled: false,
+    verified: true,
+    loading: true,
+  });
 
   const refresh = useCallback(async () => {
     if (!user) {
-      setStatus({ enabled: false, loading: false });
+      setStatus({ enabled: false, verified: true, loading: false });
       return;
     }
     setStatus((s) => ({ ...s, loading: true }));
-    const { data, error } = await supabase
-      .from("user_secrets_config")
-      .select("totp_enabled")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    if (error) {
-      console.error("2FA status fetch error:", error);
+    try {
+      const res = await callTwoFactor("status");
+      setStatus({ enabled: !!res.enabled, verified: !!res.verified, loading: false });
+    } catch (err) {
+      console.error("2FA status error:", err);
+      setStatus({ enabled: false, verified: true, loading: false });
     }
-    setStatus({ enabled: !!data?.totp_enabled, loading: false });
   }, [user]);
 
   useEffect(() => {
     refresh();
   }, [refresh]);
 
-  /** Ativa 2FA: valida o código primeiro, depois persiste o segredo. */
-  const enable = useCallback(
-    async (secret: string, code: string): Promise<boolean> => {
-      if (!user) throw new Error("Not authenticated");
-      if (!verify2FAToken(code, secret)) return false;
-
-      // Verifica se já existe um registro
-      const { data: existing } = await supabase
-        .from("user_secrets_config")
-        .select("id")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if (existing) {
-        const { error } = await supabase
-          .from("user_secrets_config")
-          .update({ totp_secret: secret, totp_enabled: true })
-          .eq("user_id", user.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from("user_secrets_config").insert({
-          user_id: user.id,
-          totp_secret: secret,
-          totp_enabled: true,
-          secrets_password_hash: null,
-          secrets_password_salt: null,
-        });
-        if (error) throw error;
-      }
-
-      setStatus({ enabled: true, loading: false });
-      return true;
-    },
-    [user]
-  );
-
-  /** Desativa 2FA: exige um código TOTP válido atual. */
-  const disable = useCallback(
-    async (code: string): Promise<boolean> => {
-      if (!user) throw new Error("Not authenticated");
-      const { data, error } = await supabase
-        .from("user_secrets_config")
-        .select("totp_secret")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      if (error) throw error;
-      if (!data?.totp_secret) return false;
-      if (!verify2FAToken(code, data.totp_secret)) return false;
-
-      const { error: updErr } = await supabase
-        .from("user_secrets_config")
-        .update({ totp_enabled: false, totp_secret: null })
-        .eq("user_id", user.id);
-      if (updErr) throw updErr;
-
-      setStatus({ enabled: false, loading: false });
-      return true;
-    },
-    [user]
-  );
-
-  /** Verifica um código TOTP — usado no fluxo de login. */
-  const verify = useCallback(
-    async (code: string): Promise<boolean> => {
-      if (!user) return false;
-      const { data, error } = await supabase
-        .from("user_secrets_config")
-        .select("totp_secret, totp_enabled")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      if (error || !data?.totp_enabled || !data.totp_secret) return false;
-      return verify2FAToken(code, data.totp_secret);
-    },
-    [user]
-  );
-
-  /** Verifica se um usuário (por id) tem 2FA ativo — usado pós signIn antes de o contexto sincronizar. */
-  const isEnabledForUser = useCallback(async (userId: string): Promise<boolean> => {
-    const { data } = await supabase
-      .from("user_secrets_config")
-      .select("totp_enabled")
-      .eq("user_id", userId)
-      .maybeSingle();
-    return !!data?.totp_enabled;
+  /** Ativa 2FA: o servidor valida o código antes de persistir o segredo. */
+  const enable = useCallback(async (secret: string, code: string): Promise<boolean> => {
+    const res = await callTwoFactor("enable", { secret, code });
+    if (res.ok) setStatus({ enabled: true, verified: true, loading: false });
+    return !!res.ok;
   }, []);
 
-  return { status, refresh, enable, disable, verify, isEnabledForUser };
-}
+  /** Desativa 2FA: exige um código TOTP válido, validado no servidor. */
+  const disable = useCallback(async (code: string): Promise<boolean> => {
+    const res = await callTwoFactor("disable", { code });
+    if (res.ok) setStatus({ enabled: false, verified: true, loading: false });
+    return !!res.ok;
+  }, []);
 
-/** Helpers para flag de "já passou pelo 2FA nesta sessão". */
-export const TWO_FA_PASSED_KEY = "vk_2fa_passed";
-export function markTwoFactorPassed() {
-  sessionStorage.setItem(TWO_FA_PASSED_KEY, "1");
-}
-export function clearTwoFactorPassed() {
-  sessionStorage.removeItem(TWO_FA_PASSED_KEY);
-}
-export function hasTwoFactorPassed(): boolean {
-  return sessionStorage.getItem(TWO_FA_PASSED_KEY) === "1";
+  /** Verifica um código TOTP no servidor e libera a sessão (RLS passa a permitir os dados). */
+  const verify = useCallback(async (code: string): Promise<boolean> => {
+    const res = await callTwoFactor("verify", { code });
+    if (res.ok) setStatus((s) => ({ ...s, verified: true, loading: false }));
+    return !!res.ok;
+  }, []);
+
+  /** Estado do 2FA da sessão atual, consultado no servidor. */
+  const getSessionStatus = useCallback(async (): Promise<{ enabled: boolean; verified: boolean }> => {
+    try {
+      const res = await callTwoFactor("status");
+      return { enabled: !!res.enabled, verified: !!res.verified };
+    } catch (err) {
+      console.error("2FA status error:", err);
+      return { enabled: false, verified: true };
+    }
+  }, []);
+
+  return { status, refresh, enable, disable, verify, getSessionStatus };
 }

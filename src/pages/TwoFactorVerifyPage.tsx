@@ -8,7 +8,7 @@ import { Shield } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Seo from "@/components/Seo";
-import { useTwoFactor, markTwoFactorPassed } from "@/hooks/useTwoFactor";
+import { useTwoFactor } from "@/hooks/useTwoFactor";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
@@ -25,7 +25,6 @@ export default function TwoFactorVerifyPage() {
     try {
       const ok = await verify(code);
       if (ok) {
-        markTwoFactorPassed();
         toast.success("Verificação concluída.");
         navigate("/dashboard", { replace: true });
       } else {

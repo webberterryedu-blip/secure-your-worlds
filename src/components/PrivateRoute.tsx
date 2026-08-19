@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { hasTwoFactorPassed, useTwoFactor } from "@/hooks/useTwoFactor";
+import { useTwoFactor } from "@/hooks/useTwoFactor";
 import { Shield } from "lucide-react";
 
 export default function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
-  const { isEnabledForUser } = useTwoFactor();
+  const { getSessionStatus } = useTwoFactor();
   const location = useLocation();
   const [check, setCheck] = useState<{ loading: boolean; needs2FA: boolean }>({
     loading: true,
@@ -20,18 +20,15 @@ export default function PrivateRoute({ children }: { children: React.ReactNode }
         setCheck({ loading: false, needs2FA: false });
         return;
       }
-      if (hasTwoFactorPassed()) {
-        setCheck({ loading: false, needs2FA: false });
-        return;
-      }
-      const enabled = await isEnabledForUser(user.id);
-      if (!cancelled) setCheck({ loading: false, needs2FA: enabled });
+      // Estado autoritativo vem do servidor — não há flag local em que confiar.
+      const { enabled, verified } = await getSessionStatus();
+      if (!cancelled) setCheck({ loading: false, needs2FA: enabled && !verified });
     };
     run();
     return () => {
       cancelled = true;
     };
-  }, [user, isEnabledForUser]);
+  }, [user, getSessionStatus, location.pathname]);
 
   if (loading || check.loading) {
     return (

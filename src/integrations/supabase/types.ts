@@ -21,6 +21,8 @@ export type Database = {
           description: string | null
           devices: string[]
           email: string | null
+          enc_salt: string | null
+          enc_version: number
           expires_at: string | null
           id: string
           is_favorite: boolean
@@ -37,6 +39,8 @@ export type Database = {
           description?: string | null
           devices?: string[]
           email?: string | null
+          enc_salt?: string | null
+          enc_version?: number
           expires_at?: string | null
           id?: string
           is_favorite?: boolean
@@ -53,6 +57,8 @@ export type Database = {
           description?: string | null
           devices?: string[]
           email?: string | null
+          enc_salt?: string | null
+          enc_version?: number
           expires_at?: string | null
           id?: string
           is_favorite?: boolean
@@ -143,6 +149,8 @@ export type Database = {
           secrets_password_salt: string | null
           totp_enabled: boolean
           totp_secret: string | null
+          totp_verified_at: string | null
+          totp_verified_session_id: string | null
           updated_at: string
           user_id: string
         }
@@ -154,6 +162,8 @@ export type Database = {
           secrets_password_salt?: string | null
           totp_enabled?: boolean
           totp_secret?: string | null
+          totp_verified_at?: string | null
+          totp_verified_session_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -165,6 +175,8 @@ export type Database = {
           secrets_password_salt?: string | null
           totp_enabled?: boolean
           totp_secret?: string | null
+          totp_verified_at?: string | null
+          totp_verified_session_id?: string | null
           updated_at?: string
           user_id?: string
         }
