@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { Sidebar } from "@/components/Navigation/Sidebar";
 import { ThemeAndLangToggle } from "@/components/ThemeAndLangToggle";
+import VaultUnlockGate from "@/components/VaultUnlockGate";
 
 export default function MainLayout() {
   return (
@@ -11,7 +12,9 @@ export default function MainLayout() {
           <div className="flex justify-end mb-4">
             <ThemeAndLangToggle />
           </div>
-          <Outlet />
+          <VaultUnlockGate>
+            <Outlet />
+          </VaultUnlockGate>
         </div>
       </main>
     </div>
