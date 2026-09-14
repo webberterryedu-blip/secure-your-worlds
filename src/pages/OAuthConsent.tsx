@@ -42,12 +42,13 @@ export default function OAuthConsent() {
         setError(error.message);
         return;
       }
-      const immediate = data?.redirect_url ?? data?.redirect_to;
-      if (immediate && !data?.client) {
+      const result = data as unknown as AuthzDetails & { client?: AuthzDetails["client"] };
+      const immediate = result?.redirect_url ?? result?.redirect_to;
+      if (immediate && !result?.client) {
         window.location.href = immediate;
         return;
       }
-      setDetails(data as AuthzDetails);
+      setDetails(result);
     })();
     return () => {
       active = false;
@@ -64,7 +65,8 @@ export default function OAuthConsent() {
       setError(error.message);
       return;
     }
-    const target = data?.redirect_url ?? data?.redirect_to;
+    const result = data as unknown as AuthzDetails;
+    const target = result?.redirect_url ?? result?.redirect_to;
     if (!target) {
       setBusy(false);
       setError("O servidor de autorização não retornou um redirecionamento.");
