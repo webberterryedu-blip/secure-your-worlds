@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "sdk_version": "2.0.4",
+  "path": "/functions/v1/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://tgwaiftauxxbxfeukqoc.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "secure-vault-manager",
+      "version": "0.1.0",
+      "title": "Secure Vault Manager"
+    },
+    "tools": [
+      {
+        "name": "vault_overview",
+        "title": "Vault overview",
+        "description": "Get an overview of the signed-in user's VaultKey vault: credential counts per category and secrets count. Secret values are never exposed (zero-knowledge encryption).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "security_status",
+        "title": "Security status",
+        "description": "Check the signed-in user's VaultKey security posture: whether two-factor authentication (2FA) and the secrets vault are configured.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}

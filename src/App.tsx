@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
+import OAuthConsent from "./pages/OAuthConsent";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import SecretsUnlock from "./pages/SecretsUnlock";
@@ -50,6 +51,9 @@ const App = () => (
 
               {/* Auth - pública (login/register) */}
               <Route path="/auth" element={<Auth />} />
+
+              {/* OAuth consent (MCP / agent integrations) */}
+              <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
 
               {/* 2FA Verification - pública mas requer usuário logado */}
               <Route path="/auth/2fa-verify" element={<TwoFactorVerifyPage />} />

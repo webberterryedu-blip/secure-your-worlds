@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import Seo from "@/components/Seo";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,10 @@ export default function Auth() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  // Same-origin relative redirect target (e.g. OAuth consent return)
+  const nextParam = searchParams.get("next");
+  const nextPath = nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : null;
 
   // Calculate password strength
   const passwordStrength = useMemo(() => evaluatePasswordStrength(password), [password]);
@@ -57,7 +61,7 @@ export default function Auth() {
     );
   }
 
-  if (user) return <Navigate to="/dashboard" replace />;
+  if (user) return <Navigate to={nextPath ?? "/dashboard"} replace />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +78,7 @@ export default function Auth() {
           navigate("/auth/2fa-verify", { replace: true });
           return;
         }
-        navigate("/dashboard", { replace: true });
+        navigate(nextPath ?? "/dashboard", { replace: true });
       } else {
         await signUp(email, password, displayName);
         toast.success("Conta criada! Verifique seu e-mail para confirmar.");
