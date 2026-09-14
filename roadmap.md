@@ -1,5 +1,6 @@
 # Roadmap
 
 - [x] Enable Lovable AI for the project
-- [ ] Add agent integrations (MCP server) to VaultKey
-  - Blocker: waiting on user's MCP access choice (public vs OAuth)
+- [x] Add agent integrations (MCP server) to VaultKey
+  - OAuth-protected (user's choice), tools: vault_overview, security_status
+  - Consent route + auth next-redirect wired; manifest OK; mcp function deploys on publish
