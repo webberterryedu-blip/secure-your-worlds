@@ -20,7 +20,7 @@ export default defineTool({
 
     const { data: credentials, error: credError } = await supabase
       .from("credentials")
-      .select("category, favorite, created_at");
+      .select("category, is_favorite, created_at");
     if (credError) {
       return { content: [{ type: "text", text: credError.message }], isError: true };
     }
@@ -30,7 +30,7 @@ export default defineTool({
     for (const row of credentials ?? []) {
       const cat = (row as { category?: string }).category ?? "Outros";
       byCategory[cat] = (byCategory[cat] ?? 0) + 1;
-      if ((row as { favorite?: boolean }).favorite) favorites += 1;
+      if ((row as { is_favorite?: boolean }).is_favorite) favorites += 1;
     }
 
     const { count: secretsCount, error: secretsError } = await supabase
