@@ -18,6 +18,7 @@ import SecuritySettings from "./pages/SecuritySettings";
 import TwoFactorVerifyPage from "./pages/TwoFactorVerifyPage";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import SupportDiagnose from "./pages/SupportDiagnose";
 
 import MainLayout from "./components/Layout/MainLayout";
 import Identities from "./pages/Identities";
@@ -183,6 +184,17 @@ const App = () => (
                 }
               >
                 <Route index element={<SecuritySettings />} />
+              </Route>
+
+              <Route
+                path="/support"
+                element={
+                  <PrivateRoute>
+                    <MainLayout />
+                  </PrivateRoute>
+                }
+              >
+                <Route index element={<SupportDiagnose />} />
               </Route>
 
               {/* ==================== LEGACY NESTED ROUTES (for backwards compatibility) ==================== */}
