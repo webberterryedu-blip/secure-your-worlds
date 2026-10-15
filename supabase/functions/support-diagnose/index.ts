@@ -1,5 +1,5 @@
-import { createOpenAI } from "npm:@ai-sdk/openai@2";
-import { streamText } from "npm:ai@5";
+import { createOpenAI } from "npm:@ai-sdk/openai@3";
+import { streamText } from "npm:ai@6";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
