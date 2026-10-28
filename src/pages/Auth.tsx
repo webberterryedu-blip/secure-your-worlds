@@ -62,7 +62,33 @@ export default function Auth() {
     );
   }
 
-  if (user) return <Navigate to={nextPath ?? "/dashboard"} replace />;
+  if (user) {
+    // After an OAuth return, restore the intended destination (e.g. MCP consent)
+    const storedNext = sessionStorage.getItem("vk_oauth_next");
+    if (storedNext) sessionStorage.removeItem("vk_oauth_next");
+    return <Navigate to={nextPath ?? storedNext ?? "/dashboard"} replace />;
+  }
+
+  const handleGoogleSignIn = async () => {
+    setSubmitting(true);
+    try {
+      if (nextPath) sessionStorage.setItem("vk_oauth_next", nextPath);
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        toast.error(result.error.message || "Erro ao iniciar login com Google");
+        setSubmitting(false);
+        return;
+      }
+      if (result.redirected) return; // browser goes to Google
+      navigate(nextPath ?? "/dashboard", { replace: true });
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Erro ao iniciar login com Google";
+      toast.error(errorMessage);
+      setSubmitting(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
