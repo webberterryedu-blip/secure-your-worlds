@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { evaluatePasswordStrength } from "@/lib/crypto";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 
 
 export default function Auth() {
